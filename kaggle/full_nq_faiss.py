@@ -19,7 +19,18 @@ import torch
 from huggingface_hub import hf_hub_download
 
 BASE_MODEL = "sentence-transformers/msmarco-MiniLM-L6-cos-v5"
-ADAPTER = None  # e.g. "/kaggle/input/lora-easy/lora_easy"
+ADAPTER = None  # set to a folder path, or leave None to auto-detect an attached adapter below
+
+
+def find_adapter():
+    for cfg in sorted(Path("/kaggle/input").rglob("adapter_config.json")) if Path("/kaggle/input").exists() else []:
+        return str(cfg.parent)
+    return None
+
+
+if ADAPTER is None and not os.environ.get("NO_ADAPTER"):
+    ADAPTER = find_adapter()
+print("adapter:", ADAPTER, flush=True)
 SMOKE = int(os.environ.get("SMOKE", "0"))
 DATA_DIR = os.environ.get("DATA_DIR")
 OUT = Path(os.environ.get("OUT", "/kaggle/working/full_nq_faiss.json"))

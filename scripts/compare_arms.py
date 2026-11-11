@@ -23,7 +23,8 @@ qtext = [qtext[i] for i in sel]
 rel = [qrels[qids[i]] for i in sel]
 
 per = {}
-for tag, adapter in (("untuned", None), ("lora_easy", "artifacts/lora_easy"), ("lora_hard", "artifacts/lora_hard")):
+for tag, adapter in (("untuned", None), ("lora_easy", "artifacts/lora_easy"), ("lora_hard", "artifacts/lora_hard"),
+                     ("lora_hard_dense", "artifacts/lora_hard_dense")):
     model = SentenceTransformer(BASE, device="cpu")
     model.max_seq_length = 128
     if adapter:
@@ -41,7 +42,8 @@ for tag, adapter in (("untuned", None), ("lora_easy", "artifacts/lora_easy"), ("
     per[tag] = m
 out = {"note": "REDUCED CORPUS; dense retrieval only; paired bootstrap over queries"}
 for metric in ("ndcg@10", "mrr@10", "hit@10"):
-    for a, b in (("lora_easy", "untuned"), ("lora_hard", "untuned"), ("lora_hard", "lora_easy")):
+    for a, b in (("lora_easy", "untuned"), ("lora_hard", "untuned"), ("lora_hard_dense", "untuned"),
+                 ("lora_hard", "lora_easy"), ("lora_hard_dense", "lora_easy"), ("lora_hard_dense", "lora_hard")):
         mean, lo, hi = paired_diff_ci(per[a][metric], per[b][metric])
         out[f"{metric}: {a} minus {b}"] = {"mean": round(mean, 4), "ci95": [round(lo, 4), round(hi, 4)]}
 Path("results/dev_arm_comparison.json").write_text(json.dumps(out, indent=2))

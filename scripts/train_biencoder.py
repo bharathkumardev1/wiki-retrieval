@@ -35,7 +35,21 @@ pick = rng.choice(len(queries), size=cfg["n_pairs"], replace=False)
 q_tr = [queries[i] for i in pick]
 p_tr = [answers[i] for i in pick]
 neg_tr = None
-if cfg["hard_negatives"]:
+if cfg["hard_negatives"] and cfg.get("neg_source") == "dense":
+    from sentence_transformers import SentenceTransformer
+    from wikiret.hardneg import mine_dense
+
+    # pool: the chosen positives plus random other answers; embedded with the untuned model
+    extra = rng.choice(np.setdiff1d(np.arange(len(answers)), pick), size=cfg["pool_size"] - len(pick), replace=False)
+    pool_ids = np.concatenate([pick, extra])
+    enc = SentenceTransformer(cfg["model"], device="cpu")
+    enc.max_seq_length = cfg["max_len"]
+    pool_emb = enc.encode([answers[i] for i in pool_ids], batch_size=128, normalize_embeddings=True, show_progress_bar=False)
+    q_emb = enc.encode(q_tr, batch_size=128, normalize_embeddings=True, show_progress_bar=False)
+    neg_pos = mine_dense(q_emb, pool_emb, list(range(len(pick))), lo=cfg["neg_lo"], hi=cfg["neg_hi"], seed=seed)
+    neg_tr = [answers[pool_ids[j]] for j in neg_pos]
+    del enc
+elif cfg["hard_negatives"]:
     # pool = answers of all kept pairs; ids for the chosen queries' positives index into it
     neg_idx = mine(q_tr, answers, [int(i) for i in pick], lo=cfg["neg_lo"], hi=cfg["neg_hi"], seed=seed)
     neg_tr = [answers[j] for j in neg_idx]

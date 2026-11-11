@@ -1,0 +1,145 @@
+{
+  "note": "REDUCED CORPUS (relevant passages + seeded distractors); not comparable to full-corpus numbers",
+  "model": "sentence-transformers/msmarco-MiniLM-L6-cos-v5",
+  "adapter": "artifacts/lora_hard_dense",
+  "max_len": 128,
+  "n_passages": 104201,
+  "n_queries": 3452,
+  "encode_seconds": 1669,
+  "metrics": {
+    "bm25_tuned": {
+      "hit@10": {
+        "mean": 0.8439,
+        "ci95": [
+          0.8314,
+          0.856
+        ]
+      },
+      "mrr@10": {
+        "mean": 0.6482,
+        "ci95": [
+          0.635,
+          0.6622
+        ]
+      },
+      "ndcg@10": {
+        "mean": 0.6809,
+        "ci95": [
+          0.6688,
+          0.6939
+        ]
+      },
+      "recall@10": {
+        "mean": 0.821,
+        "ci95": [
+          0.8083,
+          0.8336
+        ]
+      },
+      "recall@100": {
+        "mean": 0.927,
+        "ci95": [
+          0.9183,
+          0.935
+        ]
+      }
+    },
+    "dense": {
+      "hit@10": {
+        "mean": 0.8859,
+        "ci95": [
+          0.8751,
+          0.896
+        ]
+      },
+      "mrr@10": {
+        "mean": 0.7429,
+        "ci95": [
+          0.7296,
+          0.7549
+        ]
+      },
+      "ndcg@10": {
+        "mean": 0.7664,
+        "ci95": [
+          0.7543,
+          0.7773
+        ]
+      },
+      "recall@10": {
+        "mean": 0.8713,
+        "ci95": [
+          0.8602,
+          0.8816
+        ]
+      },
+      "recall@100": {
+        "mean": 0.9541,
+        "ci95": [
+          0.9472,
+          0.9605
+        ]
+      }
+    },
+    "hybrid_rrf": {
+      "hit@10": {
+        "mean": 0.925,
+        "ci95": [
+          0.916,
+          0.9334
+        ]
+      },
+      "mrr@10": {
+        "mean": 0.753,
+        "ci95": [
+          0.7408,
+          0.7649
+        ]
+      },
+      "ndcg@10": {
+        "mean": 0.7823,
+        "ci95": [
+          0.7716,
+          0.7929
+        ]
+      },
+      "recall@10": {
+        "mean": 0.9085,
+        "ci95": [
+          0.8994,
+          0.9173
+        ]
+      },
+      "recall@100": {
+        "mean": 0.9782,
+        "ci95": [
+          0.9735,
+          0.9826
+        ]
+      }
+    }
+  },
+  "paired_differences": {
+    "ndcg@10 dense minus bm25_tuned": {
+      "mean": 0.0855,
+      "ci95": [
+        0.0714,
+        0.0986
+      ]
+    },
+    "ndcg@10 hybrid_rrf minus bm25_tuned": {
+      "mean": 0.1014,
+      "ci95": [
+        0.0924,
+        0.1103
+      ]
+    },
+    "ndcg@10 hybrid_rrf minus dense": {
+      "mean": 0.016,
+      "ci95": [
+        0.0078,
+        0.0246
+      ]
+    }
+  }
+}
