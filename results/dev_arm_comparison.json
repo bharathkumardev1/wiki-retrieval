@@ -1,0 +1,66 @@
+{
+  "note": "REDUCED CORPUS; dense retrieval only; paired bootstrap over queries",
+  "ndcg@10: lora_easy minus untuned": {
+    "mean": 0.0399,
+    "ci95": [
+      0.0328,
+      0.0468
+    ]
+  },
+  "ndcg@10: lora_hard minus untuned": {
+    "mean": 0.0364,
+    "ci95": [
+      0.0297,
+      0.0432
+    ]
+  },
+  "ndcg@10: lora_hard minus lora_easy": {
+    "mean": -0.0035,
+    "ci95": [
+      -0.0066,
+      -0.0005
+    ]
+  },
+  "mrr@10: lora_easy minus untuned": {
+    "mean": 0.0371,
+    "ci95": [
+      0.0289,
+      0.045
+    ]
+  },
+  "mrr@10: lora_hard minus untuned": {
+    "mean": 0.0331,
+    "ci95": [
+      0.0252,
+      0.0409
+    ]
+  },
+  "mrr@10: lora_hard minus lora_easy": {
+    "mean": -0.004,
+    "ci95": [
+      -0.0079,
+      -0.0001
+    ]
+  },
+  "hit@10: lora_easy minus untuned": {
+    "mean": 0.0371,
+    "ci95": [
+      0.0287,
+      0.0458
+    ]
+  },
+  "hit@10: lora_hard minus untuned": {
+    "mean": 0.0336,
+    "ci95": [
+      0.0258,
+      0.042
+    ]
+  },
+  "hit@10: lora_hard minus lora_easy": {
+    "mean": -0.0035,
+    "ci95": [
+      -0.0075,
+      0.0006
+    ]
+  }
+}
