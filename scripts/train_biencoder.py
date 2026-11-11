@@ -54,7 +54,7 @@ def embed(texts, max_len):
     return F.normalize((h * m).sum(1) / m.sum(1), dim=-1)
 
 
-mlflow.set_tracking_uri("file:./mlruns")
+mlflow.set_tracking_uri("sqlite:///mlruns.db")
 mlflow.set_experiment("biencoder")
 bs, steps_per_epoch = cfg["batch_size"], cfg["n_pairs"] // cfg["batch_size"]
 with mlflow.start_run(run_name=cfg["name"]):
