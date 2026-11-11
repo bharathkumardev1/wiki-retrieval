@@ -11,6 +11,8 @@ import time
 from pathlib import Path
 
 subprocess.run([sys.executable, "-m", "pip", "install", "-q", "sentence-transformers", "peft", "faiss-cpu"], check=False)
+# Kaggle ships torchao 0.10, which peft (>=0.16 required) rejects when it injects LoRA layers. We do not use it.
+subprocess.run([sys.executable, "-m", "pip", "uninstall", "-y", "torchao"], check=False)
 
 import faiss
 import numpy as np

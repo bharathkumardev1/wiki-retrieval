@@ -26,3 +26,17 @@ def mine(queries: list[str], pool: list[str], positives: list[int], lo: int = 10
         cand = [c for c in cand[lo:hi] if c != pos and norm(pool[c]) != norm(pool[pos])]
         out.append(int(rng.choice(cand)) if cand else int(rng.integers(len(pool))))
     return out
+
+
+def mine_dense(query_emb: np.ndarray, pool_emb: np.ndarray, positives: list[int], lo: int = 100, hi: int = 500,
+               seed: int = 0) -> list[int]:
+    """Same window as `mine`, but ranks come from dense similarity, i.e. from the current index."""
+    rng = np.random.default_rng(seed)
+    out = []
+    for s in range(0, len(query_emb), 256):
+        sc = query_emb[s:s + 256] @ pool_emb.T
+        top = np.argsort(-sc, axis=1)[:, :hi]
+        for row, pos in zip(top, positives[s:s + 256]):
+            cand = [c for c in row[lo:hi] if c != pos]
+            out.append(int(rng.choice(cand)))
+    return out

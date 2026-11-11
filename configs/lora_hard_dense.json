@@ -1,0 +1,5 @@
+{"name": "lora_hard_dense", "seed": 0, "model": "sentence-transformers/msmarco-MiniLM-L6-cos-v5",
+ "pairs": "data/train/nq_pairs.parquet", "dev_corpus": "data/dev/corpus.parquet",
+ "n_pairs": 8000, "epochs": 1, "batch_size": 32, "max_len": 128, "temperature": 0.05,
+ "lr": 0.0002, "lora_r": 16, "lora_alpha": 32, "hard_negatives": true, "neg_source": "dense", "pool_size": 30000, "neg_lo": 100, "neg_hi": 500,
+ "out": "artifacts/lora_hard_dense"}
