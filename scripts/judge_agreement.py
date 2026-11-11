@@ -9,7 +9,7 @@ import json
 import sys
 from pathlib import Path
 
-from wikiret.agent.agreement import LABELS, report
+from wikiret.agent.agreement import report
 
 ALIASES = {"supported": "supported", "partial": "partial", "partially": "partial", "partially supported": "partial",
            "not supported": "not_supported", "not_supported": "not_supported", "unsupported": "not_supported"}

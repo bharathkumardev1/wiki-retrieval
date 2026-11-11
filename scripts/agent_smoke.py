@@ -12,7 +12,7 @@ from pathlib import Path
 import numpy as np
 import pyarrow.parquet as pq
 
-from wikiret.agent import REFUSAL, ExtractiveGenerator, Passage, build_agent
+from wikiret.agent import ExtractiveGenerator, Passage, build_agent
 from wikiret.agent.text import is_instruction_like
 from wikiret.bm25 import BM25Builder
 from wikiret.data import load_corpus, load_qrels, load_queries
