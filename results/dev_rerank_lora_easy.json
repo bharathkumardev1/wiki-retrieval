@@ -1,0 +1,120 @@
+{
+  "note": "REDUCED CORPUS; not comparable to full-corpus numbers",
+  "n_queries": 3452,
+  "depth": 20,
+  "reranker": "cross-encoder/ms-marco-MiniLM-L6-v2 (ONNX, max_len 256)",
+  "metrics": {
+    "hybrid": {
+      "hit@10": {
+        "mean": 0.9267,
+        "ci95": [
+          0.918,
+          0.9348
+        ]
+      },
+      "mrr@10": {
+        "mean": 0.7543,
+        "ci95": [
+          0.7417,
+          0.7662
+        ]
+      },
+      "ndcg@10": {
+        "mean": 0.7831,
+        "ci95": [
+          0.7722,
+          0.7933
+        ]
+      },
+      "recall@10": {
+        "mean": 0.9098,
+        "ci95": [
+          0.9005,
+          0.9186
+        ]
+      }
+    },
+    "rerank_top10": {
+      "hit@10": {
+        "mean": 0.9267,
+        "ci95": [
+          0.918,
+          0.9348
+        ]
+      },
+      "mrr@10": {
+        "mean": 0.855,
+        "ci95": [
+          0.8449,
+          0.8646
+        ]
+      },
+      "ndcg@10": {
+        "mean": 0.8589,
+        "ci95": [
+          0.8491,
+          0.8677
+        ]
+      },
+      "recall@10": {
+        "mean": 0.9098,
+        "ci95": [
+          0.9005,
+          0.9186
+        ]
+      }
+    },
+    "rerank_top20": {
+      "hit@10": {
+        "mean": 0.9528,
+        "ci95": [
+          0.9455,
+          0.9592
+        ]
+      },
+      "mrr@10": {
+        "mean": 0.8674,
+        "ci95": [
+          0.8578,
+          0.8761
+        ]
+      },
+      "ndcg@10": {
+        "mean": 0.8771,
+        "ci95": [
+          0.8687,
+          0.885
+        ]
+      },
+      "recall@10": {
+        "mean": 0.94,
+        "ci95": [
+          0.9325,
+          0.9471
+        ]
+      }
+    }
+  },
+  "paired_differences": {
+    "ndcg@10 rerank_top10 minus hybrid": {
+      "mean": 0.0758,
+      "ci95": [
+        0.0691,
+        0.0822
+      ]
+    },
+    "ndcg@10 rerank_top20 minus hybrid": {
+      "mean": 0.0941,
+      "ci95": [
+        0.086,
+        0.1017
+      ]
+    }
+  },
+  "rerank_ms_per_query": {
+    "p50": 794,
+    "p95": 1848,
+    "p99": 2007
+  },
+  "host": "2 vCPU container, one query at a time, ONNX Runtime CPU"
+}

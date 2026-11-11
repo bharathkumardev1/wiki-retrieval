@@ -1,0 +1,6 @@
+{
+  "note": "Rerank stage only (tokenize + ONNX Runtime), 20 candidates per query, 150 queries, one query at a time, 2 vCPU container with no other job of mine running. Reduced dev corpus queries; latency does not depend on corpus size.",
+  "command": "python scripts/eval_rerank.py data/nq data/dev --limit 150 --depth 20 --reranker artifacts/<model>",
+  "fp32": {"p50_ms": 1103, "p95_ms": 1230, "p99_ms": 1338},
+  "int8": {"p50_ms": 797, "p95_ms": 905, "p99_ms": 936}
+}
