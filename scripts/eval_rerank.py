@@ -38,7 +38,8 @@ Q = np.load(a.dev / f"q_{a.tag}.npy")[: len(sel)] if not a.limit else np.load(a.
 
 idx = HybridIndex(ids, titles, texts, emb, nlist=1024, pq_bytes=48, model_tag=a.tag)
 rr = OnnxReranker(a.reranker)
-orders = {"hybrid": [], **{f"rerank_top{d}": [] for d in (10, 20, a.depth) if d <= a.depth}}
+depths = sorted({d for d in (10, 20, a.depth) if d <= a.depth})
+orders = {"hybrid": [], **{f"rerank_top{d}": [] for d in depths}}
 lat = []
 for q, v in zip(qtext, Q):
     order = idx.search(q, v).order
@@ -47,11 +48,11 @@ for q, v in zip(qtext, Q):
     s = rr(q, [f"{titles[i]} {texts[i]}" for i in head])
     lat.append((time.perf_counter() - t0) * 1000)
     orders["hybrid"].append(order)
-    for d in (10, 20, a.depth):
-        if d <= a.depth:
-            h = head[:d]
-            orders[f"rerank_top{d}"].append(np.concatenate([h[np.argsort(-s[:d], kind="stable")], order[d:]]))
+    for d in depths:
+        h = head[:d]
+        orders[f"rerank_top{d}"].append(np.concatenate([h[np.argsort(-s[:d], kind="stable")], order[d:]]))
 
+assert all(len(o) == len(rel) for o in orders.values()), "every ranking needs exactly one entry per query"
 per, out = {}, {}
 for name, o in orders.items():
     ranked = [[ids[j] for j in row] for row in o]

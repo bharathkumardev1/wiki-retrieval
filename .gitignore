@@ -7,3 +7,5 @@ artifacts/
 mlruns/
 mlruns.db
 kaggle/*.zip
+
+*.log
