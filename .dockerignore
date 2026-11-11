@@ -1,0 +1,9 @@
+.git
+.venv
+data
+artifacts
+mlruns
+mlruns.db
+results
+**/__pycache__
+ingest/bin

@@ -1,0 +1,19 @@
+# docker compose up --build
+# Expects data/dev (corpus.parquet and emb_lora_easy.npy) and artifacts/ in this folder; see README for how to build them.
+services:
+  search:
+    build:
+      context: .
+      args:
+        PYTHON_IMAGE: ${PYTHON_IMAGE:-python:3.13-slim}
+    image: wikiret:dev
+    ports: ["8000:8000"]
+    volumes:
+      - ./data/dev:/data:ro
+      - ./artifacts:/artifacts:ro
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request as u; u.urlopen('http://localhost:8000/healthz', timeout=3)"]
+      interval: 10s
+      timeout: 5s
+      retries: 30
+      start_period: 120s
