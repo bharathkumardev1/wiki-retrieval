@@ -1,0 +1,5 @@
+data/
+*.jsonl
+*.bz2
+__pycache__/
+.venv/
