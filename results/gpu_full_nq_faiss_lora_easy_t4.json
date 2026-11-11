@@ -1,0 +1,310 @@
+{
+  "note": "FULL CORPUS",
+  "base_model": "sentence-transformers/msmarco-MiniLM-L6-cos-v5",
+  "adapter": "/kaggle/input/datasets/bharath1452/lora-easy/lora_easy",
+  "n_passages": 2681468,
+  "n_queries": 3452,
+  "device_encode": "Tesla T4",
+  "cpu_count": 4,
+  "faiss": "1.16.0",
+  "encode_seconds": 1390,
+  "exact": {
+    "ndcg@10": {
+      "mean": 0.402,
+      "ci95": [
+        0.3896,
+        0.4141
+      ]
+    },
+    "hit@10": {
+      "mean": 0.6292,
+      "ci95": [
+        0.6124,
+        0.6451
+      ]
+    },
+    "recall@100": {
+      "mean": 0.829,
+      "ci95": [
+        0.817,
+        0.8402
+      ]
+    }
+  },
+  "ivfpq": [
+    {
+      "nlist": 4096,
+      "pq_bytes_per_vector": 48,
+      "build_seconds": 103,
+      "code_bytes_total": 128710464,
+      "float32_bytes_total": 4118734848,
+      "sweep": [
+        {
+          "nprobe": 1,
+          "overlap_at_100_with_exact": 0.3375,
+          "metrics": {
+            "ndcg@10": {
+              "mean": 0.1971,
+              "ci95": [
+                0.1865,
+                0.208
+              ]
+            },
+            "hit@10": {
+              "mean": 0.3082,
+              "ci95": [
+                0.2926,
+                0.323
+              ]
+            },
+            "recall@100": {
+              "mean": 0.3857,
+              "ci95": [
+                0.3691,
+                0.4013
+              ]
+            }
+          },
+          "single_query_ms_cpu": {
+            "p50": 0.4,
+            "p95": 0.44,
+            "p99": 0.46
+          }
+        },
+        {
+          "nprobe": 4,
+          "overlap_at_100_with_exact": 0.4972,
+          "metrics": {
+            "ndcg@10": {
+              "mean": 0.2772,
+              "ci95": [
+                0.2653,
+                0.289
+              ]
+            },
+            "hit@10": {
+              "mean": 0.4389,
+              "ci95": [
+                0.4206,
+                0.456
+              ]
+            },
+            "recall@100": {
+              "mean": 0.5676,
+              "ci95": [
+                0.5517,
+                0.5842
+              ]
+            }
+          },
+          "single_query_ms_cpu": {
+            "p50": 0.52,
+            "p95": 0.6,
+            "p99": 0.64
+          }
+        },
+        {
+          "nprobe": 16,
+          "overlap_at_100_with_exact": 0.5852,
+          "metrics": {
+            "ndcg@10": {
+              "mean": 0.3153,
+              "ci95": [
+                0.3035,
+                0.3269
+              ]
+            },
+            "hit@10": {
+              "mean": 0.5046,
+              "ci95": [
+                0.4881,
+                0.5214
+              ]
+            },
+            "recall@100": {
+              "mean": 0.6713,
+              "ci95": [
+                0.6569,
+                0.6856
+              ]
+            }
+          },
+          "single_query_ms_cpu": {
+            "p50": 0.93,
+            "p95": 1.16,
+            "p99": 1.27
+          }
+        },
+        {
+          "nprobe": 64,
+          "overlap_at_100_with_exact": 0.6241,
+          "metrics": {
+            "ndcg@10": {
+              "mean": 0.3327,
+              "ci95": [
+                0.3201,
+                0.3443
+              ]
+            },
+            "hit@10": {
+              "mean": 0.5365,
+              "ci95": [
+                0.5194,
+                0.5533
+              ]
+            },
+            "recall@100": {
+              "mean": 0.7292,
+              "ci95": [
+                0.7157,
+                0.7434
+              ]
+            }
+          },
+          "single_query_ms_cpu": {
+            "p50": 2.63,
+            "p95": 3.08,
+            "p99": 3.18
+          }
+        }
+      ]
+    },
+    {
+      "nlist": 4096,
+      "pq_bytes_per_vector": 96,
+      "build_seconds": 111,
+      "code_bytes_total": 257420928,
+      "float32_bytes_total": 4118734848,
+      "sweep": [
+        {
+          "nprobe": 1,
+          "overlap_at_100_with_exact": 0.3563,
+          "metrics": {
+            "ndcg@10": {
+              "mean": 0.2066,
+              "ci95": [
+                0.196,
+                0.2181
+              ]
+            },
+            "hit@10": {
+              "mean": 0.3146,
+              "ci95": [
+                0.2987,
+                0.3297
+              ]
+            },
+            "recall@100": {
+              "mean": 0.3869,
+              "ci95": [
+                0.3705,
+                0.4031
+              ]
+            }
+          },
+          "single_query_ms_cpu": {
+            "p50": 0.48,
+            "p95": 0.55,
+            "p99": 0.6
+          }
+        },
+        {
+          "nprobe": 4,
+          "overlap_at_100_with_exact": 0.5555,
+          "metrics": {
+            "ndcg@10": {
+              "mean": 0.2976,
+              "ci95": [
+                0.2854,
+                0.3097
+              ]
+            },
+            "hit@10": {
+              "mean": 0.4583,
+              "ci95": [
+                0.4412,
+                0.4751
+              ]
+            },
+            "recall@100": {
+              "mean": 0.5738,
+              "ci95": [
+                0.5579,
+                0.5902
+              ]
+            }
+          },
+          "single_query_ms_cpu": {
+            "p50": 0.72,
+            "p95": 0.84,
+            "p99": 0.94
+          }
+        },
+        {
+          "nprobe": 16,
+          "overlap_at_100_with_exact": 0.6959,
+          "metrics": {
+            "ndcg@10": {
+              "mean": 0.3458,
+              "ci95": [
+                0.3335,
+                0.3575
+              ]
+            },
+            "hit@10": {
+              "mean": 0.5368,
+              "ci95": [
+                0.5191,
+                0.5539
+              ]
+            },
+            "recall@100": {
+              "mean": 0.6867,
+              "ci95": [
+                0.6723,
+                0.701
+              ]
+            }
+          },
+          "single_query_ms_cpu": {
+            "p50": 1.53,
+            "p95": 1.93,
+            "p99": 2.08
+          }
+        },
+        {
+          "nprobe": 64,
+          "overlap_at_100_with_exact": 0.7814,
+          "metrics": {
+            "ndcg@10": {
+              "mean": 0.3715,
+              "ci95": [
+                0.3582,
+                0.3833
+              ]
+            },
+            "hit@10": {
+              "mean": 0.5823,
+              "ci95": [
+                0.566,
+                0.5985
+              ]
+            },
+            "recall@100": {
+              "mean": 0.7592,
+              "ci95": [
+                0.7461,
+                0.7725
+              ]
+            }
+          },
+          "single_query_ms_cpu": {
+            "p50": 4.61,
+            "p95": 5.51,
+            "p99": 5.87
+          }
+        }
+      ]
+    }
+  ]
+}
