@@ -1,0 +1,17 @@
+# Mounts the repo's data and artifacts folders into the kind node so the pod can read them
+# through hostPath volumes. The model files are large and not baked into the image.
+kind: Cluster
+apiVersion: kind.x-k8s.io/v1alpha4
+name: wikiret
+nodes:
+  - role: control-plane
+    extraMounts:
+      - hostPath: ./data/dev
+        containerPath: /mnt/wikiret/data
+        readOnly: true
+      - hostPath: ./artifacts
+        containerPath: /mnt/wikiret/artifacts
+        readOnly: true
+    extraPortMappings:
+      - containerPort: 30080
+        hostPort: 8000

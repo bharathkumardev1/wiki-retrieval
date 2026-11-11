@@ -1,0 +1,62 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: wikiret-search
+  labels: {app: wikiret-search}
+spec:
+  replicas: 1
+  selector:
+    matchLabels: {app: wikiret-search}
+  template:
+    metadata:
+      labels: {app: wikiret-search}
+      annotations:
+        # Plain annotation scraping, so no Prometheus operator CRDs are needed.
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "8000"
+        prometheus.io/path: /metrics
+    spec:
+      securityContext: {runAsNonRoot: true, runAsUser: 10001}
+      containers:
+        - name: search
+          image: wikiret:dev
+          imagePullPolicy: IfNotPresent
+          ports: [{containerPort: 8000, name: http}]
+          env:
+            - {name: WIKIRET_DATA_DIR, value: /data}
+            - {name: WIKIRET_ADAPTER, value: /artifacts/lora_easy}
+            - {name: WIKIRET_RERANKER_DIR, value: /artifacts/reranker_int8}
+          resources:
+            requests: {cpu: "1", memory: 2Gi}
+            limits: {cpu: "2", memory: 4Gi}
+          # Index construction runs at startup, so give it time before liveness starts counting.
+          startupProbe:
+            httpGet: {path: /healthz, port: http}
+            periodSeconds: 5
+            failureThreshold: 60
+          readinessProbe:
+            httpGet: {path: /healthz, port: http}
+            periodSeconds: 10
+          livenessProbe:
+            httpGet: {path: /healthz, port: http}
+            periodSeconds: 20
+            failureThreshold: 3
+          volumeMounts:
+            - {name: data, mountPath: /data, readOnly: true}
+            - {name: artifacts, mountPath: /artifacts, readOnly: true}
+      volumes:
+        - name: data
+          hostPath: {path: /mnt/wikiret/data, type: Directory}
+        - name: artifacts
+          hostPath: {path: /mnt/wikiret/artifacts, type: Directory}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: wikiret-search
+  labels: {app: wikiret-search}
+spec:
+  type: NodePort
+  selector: {app: wikiret-search}
+  ports:
+    - {name: http, port: 8000, targetPort: http, nodePort: 30080}
