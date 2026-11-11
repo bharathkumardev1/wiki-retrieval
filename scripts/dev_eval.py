@@ -1,6 +1,6 @@
 """BM25, dense and hybrid on the reduced dev corpus (see make_dev_corpus.py).
 
-python scripts/dev_eval.py data/nq data/dev --model sentence-transformers/all-MiniLM-L6-v2"""
+python scripts/dev_eval.py data/nq data/dev --model sentence-transformers/msmarco-MiniLM-L6-cos-v5"""
 import argparse
 import json
 import time
@@ -18,7 +18,7 @@ from wikiret.metrics import bootstrap_ci, paired_diff_ci, per_query
 ap = argparse.ArgumentParser()
 ap.add_argument("nq", type=Path)
 ap.add_argument("dev", type=Path)
-ap.add_argument("--model", default="sentence-transformers/all-MiniLM-L6-v2")
+ap.add_argument("--model", default="sentence-transformers/msmarco-MiniLM-L6-cos-v5")
 ap.add_argument("--max-len", type=int, default=128)
 ap.add_argument("--adapter", type=Path, default=None)
 ap.add_argument("--tag", default="untuned")

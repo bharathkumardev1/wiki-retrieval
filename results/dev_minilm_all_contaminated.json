@@ -1,0 +1,146 @@
+{
+  "note": "REDUCED CORPUS (relevant passages + seeded distractors); not comparable to full-corpus numbers",
+  "model": "sentence-transformers/all-MiniLM-L6-v2",
+  "adapter": null,
+  "max_len": 128,
+  "n_passages": 104201,
+  "n_queries": 3452,
+  "encode_seconds": 1939,
+  "metrics": {
+    "bm25_tuned": {
+      "hit@10": {
+        "mean": 0.8439,
+        "ci95": [
+          0.8314,
+          0.856
+        ]
+      },
+      "mrr@10": {
+        "mean": 0.6482,
+        "ci95": [
+          0.635,
+          0.6622
+        ]
+      },
+      "ndcg@10": {
+        "mean": 0.6809,
+        "ci95": [
+          0.6688,
+          0.6939
+        ]
+      },
+      "recall@10": {
+        "mean": 0.821,
+        "ci95": [
+          0.8083,
+          0.8336
+        ]
+      },
+      "recall@100": {
+        "mean": 0.927,
+        "ci95": [
+          0.9183,
+          0.935
+        ]
+      }
+    },
+    "dense": {
+      "hit@10": {
+        "mean": 0.951,
+        "ci95": [
+          0.9438,
+          0.9577
+        ]
+      },
+      "mrr@10": {
+        "mean": 0.8103,
+        "ci95": [
+          0.7996,
+          0.8215
+        ]
+      },
+      "ndcg@10": {
+        "mean": 0.8353,
+        "ci95": [
+          0.8259,
+          0.8448
+        ]
+      },
+      "recall@10": {
+        "mean": 0.9408,
+        "ci95": [
+          0.9331,
+          0.948
+        ]
+      },
+      "recall@100": {
+        "mean": 0.9848,
+        "ci95": [
+          0.9808,
+          0.9885
+        ]
+      }
+    },
+    "hybrid_rrf": {
+      "hit@10": {
+        "mean": 0.9458,
+        "ci95": [
+          0.9374,
+          0.9531
+        ]
+      },
+      "mrr@10": {
+        "mean": 0.7805,
+        "ci95": [
+          0.769,
+          0.7922
+        ]
+      },
+      "ndcg@10": {
+        "mean": 0.8081,
+        "ci95": [
+          0.7978,
+          0.8179
+        ]
+      },
+      "recall@10": {
+        "mean": 0.9306,
+        "ci95": [
+          0.9222,
+          0.9382
+        ]
+      },
+      "recall@100": {
+        "mean": 0.9885,
+        "ci95": [
+          0.9847,
+          0.9917
+        ]
+      }
+    }
+  },
+  "paired_differences": {
+    "ndcg@10 dense minus bm25_tuned": {
+      "mean": 0.1544,
+      "ci95": [
+        0.1415,
+        0.1668
+      ]
+    },
+    "ndcg@10 hybrid_rrf minus bm25_tuned": {
+      "mean": 0.1273,
+      "ci95": [
+        0.119,
+        0.1354
+      ]
+    },
+    "ndcg@10 hybrid_rrf minus dense": {
+      "mean": -0.0271,
+      "ci95": [
+        -0.0348,
+        -0.0188
+      ]
+    }
+  },
+  "caveat": "CONTAMINATED REFERENCE: all-MiniLM-L6-v2 lists natural_questions in its training data, so these dense scores are inflated for NQ. Not used as the baseline."
+}
