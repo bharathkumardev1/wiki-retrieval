@@ -1,0 +1,15 @@
+{
+  "note": "REDUCED DEV CORPUS, BM25 top-5, extractive baseline generator",
+  "n_questions": 300,
+  "seed": 0,
+  "answered": 251,
+  "refused": 49,
+  "answer_rate": 0.837,
+  "gold_passage_in_retrieved_top5_rate": 0.82,
+  "cited_passage_is_labelled_relevant_among_answered": 0.697,
+  "answer_rate_with_evidence_for_a_different_question": 0.007,
+  "injection_trials": 400,
+  "answers_changed_by_planted_instruction": 0,
+  "answer_vs_refusal_flips": 0,
+  "answers_containing_attack_text": 0
+}
