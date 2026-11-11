@@ -11,6 +11,7 @@ paraphrase that shares few words with the source. See docs/adr/006."""
 from __future__ import annotations
 
 import re
+from collections.abc import Callable
 from dataclasses import dataclass
 
 from .text import (clean_sentences, content_tokens, coverage, expects_number, has_number_or_date, is_instruction_like,
@@ -27,6 +28,12 @@ class VerifyConfig:
     min_support: float = 0.7
     min_relevance: float = 0.5
     min_claim_tokens: int = 2
+    # Optional learned answerability score for (question, passage text), for example the ONNX
+    # cross-encoder. The lexical relevance check cannot tell a passage that answers from one that
+    # only shares words (docs/adr/006); the threshold has to be calibrated on human labels, so
+    # the default is off.
+    answerability: Callable[[str, str], float] | None = None
+    min_answerability: float = 0.0
 
 
 def split_claims(draft: str) -> list[Claim]:
@@ -57,11 +64,50 @@ def score_claim(question: str, claim_text: str, passage: Passage) -> tuple[float
     return support, relevance
 
 
-def judge_label(support: float, relevance: float, cfg: VerifyConfig = VerifyConfig()) -> str:
-    """Three-way label comparable with the human rubric (docs/label_rubric.md)."""
-    if support >= cfg.min_support and relevance >= cfg.min_relevance:
+def check_claim(question: str, c: Claim, passages: list[Passage], cfg: VerifyConfig = VerifyConfig()) -> ClaimCheck:
+    if is_instruction_like(c.text):
+        return ClaimCheck(c.text, c.citations, False, "claim looks like an instruction")
+    if len(content_tokens(c.text)) < cfg.min_claim_tokens:
+        return ClaimCheck(c.text, c.citations, False, "claim too short to verify")
+    if not c.citations:
+        return ClaimCheck(c.text, c.citations, False, "no citation")
+    if any(not 1 <= n <= len(passages) for n in c.citations):
+        return ClaimCheck(c.text, c.citations, False, "unknown citation")
+    best = None
+    for n in c.citations:
+        p = passages[n - 1]
+        support, rel = score_claim(question, c.text, p)
+        body = " ".join(clean_sentences(p.text)).lower()
+        facts_ok = numbers(c.text) <= numbers(body) and all(q.lower() in body for q in quotes(c.text))
+        cand = (support, rel, facts_ok)
+        if best is None or cand > best:
+            best = cand
+    support, rel, facts_ok = best
+    if support < cfg.min_support:
+        reason = "not supported by the cited passage"
+    elif not facts_ok:
+        reason = "number or quotation not found in the cited passage"
+    elif expects_number(question) and not has_number_or_date(c.text):
+        # 'when' and 'how many' questions need a figure or date; a sentence about the right
+        # topic without one answers a different question
+        reason = "answer type mismatch: a number or date is expected"
+    elif rel < cfg.min_relevance:
+        reason = "cited passage does not address the question"
+    elif cfg.answerability is not None and not any(
+            cfg.answerability(question, f"{passages[n - 1].title} {passages[n - 1].text}") >= cfg.min_answerability
+            for n in c.citations):
+        reason = "answerability score below threshold"
+    else:
+        reason = "supported"
+    return ClaimCheck(c.text, c.citations, reason == "supported", reason, round(support, 3), round(rel, 3))
+
+
+def judge_label(check: ClaimCheck, cfg: VerifyConfig = VerifyConfig()) -> str:
+    """Three-way label comparable with the human rubric (docs/label_rubric.md), derived from the
+    same checks the agent gates on, so validating the judge validates the gate."""
+    if check.ok:
         return "supported"
-    if support >= cfg.min_support or (support >= 0.4 and relevance >= cfg.min_relevance):
+    if check.support >= cfg.min_support or (check.support >= 0.4 and check.relevance >= cfg.min_relevance):
         return "partial"
     return "not_supported"
 
@@ -70,42 +116,5 @@ def verify(question: str, draft: str, passages: list[Passage], cfg: VerifyConfig
     claims = split_claims(draft)
     if not claims:
         return Verdict(False, (ClaimCheck("", (), False, "empty draft"),))
-    checks = []
-    for c in claims:
-        if is_instruction_like(c.text):
-            checks.append(ClaimCheck(c.text, c.citations, False, "claim looks like an instruction"))
-            continue
-        if len(content_tokens(c.text)) < cfg.min_claim_tokens:
-            checks.append(ClaimCheck(c.text, c.citations, False, "claim too short to verify"))
-            continue
-        if expects_number(question) and not has_number_or_date(c.text):
-            # 'when' and 'how many' questions need a figure or date; a sentence about the right
-            # topic without one answers a different question
-            checks.append(ClaimCheck(c.text, c.citations, False, "answer type mismatch: a number or date is expected"))
-            continue
-        if not c.citations:
-            checks.append(ClaimCheck(c.text, c.citations, False, "no citation"))
-            continue
-        if any(not 1 <= n <= len(passages) for n in c.citations):
-            checks.append(ClaimCheck(c.text, c.citations, False, "unknown citation"))
-            continue
-        best = None
-        for n in c.citations:
-            p = passages[n - 1]
-            support, rel = score_claim(question, c.text, p)
-            body = " ".join(clean_sentences(p.text)).lower()
-            facts_ok = numbers(c.text) <= numbers(body) and all(q.lower() in body for q in quotes(c.text))
-            cand = (support, rel, facts_ok)
-            if best is None or cand > best:
-                best = cand
-        support, rel, facts_ok = best
-        if support < cfg.min_support:
-            reason = "not supported by the cited passage"
-        elif not facts_ok:
-            reason = "number or quotation not found in the cited passage"
-        elif rel < cfg.min_relevance:
-            reason = "cited passage does not address the question"
-        else:
-            reason = "supported"
-        checks.append(ClaimCheck(c.text, c.citations, reason == "supported", reason, round(support, 3), round(rel, 3)))
-    return Verdict(all(k.ok for k in checks), tuple(checks))
+    checks = tuple(check_claim(question, c, passages, cfg) for c in claims)
+    return Verdict(all(k.ok for k in checks), checks)

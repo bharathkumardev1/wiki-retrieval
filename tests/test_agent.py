@@ -110,12 +110,15 @@ def test_number_question_rejects_an_on_topic_sentence_without_a_number():
     assert not on_topic.ok and "answer type" in on_topic.checks[0].reason
 
 
-def test_judge_label_bands():
-    cfg = VerifyConfig()
-    assert judge_label(1.0, 0.8, cfg) == "supported"
-    assert judge_label(0.9, 0.2, cfg) == "partial"
-    assert judge_label(0.5, 0.8, cfg) == "partial"
-    assert judge_label(0.1, 0.9, cfg) == "not_supported"
+def test_judge_label_follows_the_gate():
+    from wikiret.agent import check_claim
+    from wikiret.agent.verify import Claim
+    one = [EIFFEL]
+    q = "When was the Eiffel Tower completed?"
+    assert judge_label(check_claim(q, Claim("It was completed in 1889", (1,)), one)) == "supported"
+    # on topic and quoted from the passage, but it does not give the date that was asked for
+    assert judge_label(check_claim(q, Claim("The Eiffel Tower is a wrought-iron lattice tower in Paris", (1,)), one)) == "partial"
+    assert judge_label(check_claim(q, Claim("Bananas are botanically berries in 1500", (1,)), one)) == "not_supported"
 
 
 class StubRetriever(BaseRetriever):
@@ -142,3 +145,19 @@ def test_service_retriever_reads_search_response():
 
     got = ServiceRetriever(TestClient(app)).retrieve("q", 2)
     assert [p.id for p in got] == ["p1", "p3"] and got[1].title == ""
+
+
+def test_modal_may_is_not_a_date():
+    from wikiret.agent.text import has_number_or_date
+    assert not has_number_or_date("The phrase may refer to a hoop")
+    assert has_number_or_date("It opened in May and closed in December") and has_number_or_date("On 4 May the wall fell")
+
+
+def test_optional_answerability_scorer_can_veto_a_lexically_fine_claim():
+    draft = "The Eiffel Tower was completed in 1889 [1]."
+    assert verify(WHEN, draft, [EIFFEL]).ok
+    strict = VerifyConfig(answerability=lambda q, p: -1.0, min_answerability=0.0)
+    v = verify(WHEN, draft, [EIFFEL], strict)
+    assert not v.ok and "answerability" in v.checks[0].reason
+    lenient = VerifyConfig(answerability=lambda q, p: 3.0, min_answerability=0.0)
+    assert verify(WHEN, draft, [EIFFEL], lenient).ok

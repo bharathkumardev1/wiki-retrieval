@@ -65,7 +65,9 @@ def quotes(text: str) -> list[str]:
 
 
 _WH = frozenset({"who", "whom", "whose", "when", "where", "what", "which", "why", "how", "many", "much", "did", "does", "do"})
-_MONTH = re.compile(r"\b(january|february|march|april|may|june|july|august|september|october|november|december)\b", re.I)
+# Case-sensitive on purpose: lowercase "may" is a verb. "May" only counts next to a day, a year, or "in/of/since".
+_MONTH = re.compile(r"\b(?:January|February|March|April|June|July|August|September|October|November|December)\b"
+                    r"|\b(?:in|of|on|since|until|from|early|late|mid)\s+May\b|\bMay\s+\d|\d\s+May\b")
 _NUMERIC_Q = re.compile(r"^\W*(?:in\s+what\s+year|what\s+year|when|how\s+(?:many|much|long|tall|old|far|big|high|large|deep|wide|heavy))\b", re.I)
 
 
