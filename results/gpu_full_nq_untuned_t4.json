@@ -1,0 +1,59 @@
+{
+  "note": "FULL CORPUS, comparable to published BEIR numbers",
+  "base_model": "sentence-transformers/msmarco-MiniLM-L6-cos-v5",
+  "n_passages": 2681468,
+  "n_queries": 3452,
+  "precision": "fp16",
+  "device": "Tesla T4",
+  "torch": "2.11.0+cu130",
+  "runs": [
+    {
+      "tag": "untuned",
+      "adapter": null,
+      "encode_seconds": 804,
+      "passages_per_second": 3337,
+      "metrics": {
+        "hit@10": {
+          "mean": 0.5921,
+          "ci95": [
+            0.5753,
+            0.6086
+          ]
+        },
+        "mrr@10": {
+          "mean": 0.349,
+          "ci95": [
+            0.3364,
+            0.3624
+          ]
+        },
+        "ndcg@10": {
+          "mean": 0.389,
+          "ci95": [
+            0.3763,
+            0.4021
+          ]
+        },
+        "recall@10": {
+          "mean": 0.5585,
+          "ci95": [
+            0.542,
+            0.5743
+          ]
+        },
+        "recall@100": {
+          "mean": 0.7863,
+          "ci95": [
+            0.7724,
+            0.7995
+          ]
+        }
+      },
+      "single_query_ms_encode_plus_exact_search": {
+        "p50": 15.51,
+        "p95": 16.12,
+        "p99": 16.69
+      }
+    }
+  ]
+}
