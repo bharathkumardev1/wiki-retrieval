@@ -11,6 +11,8 @@ from ..bm25 import analyze
 
 _SENT_SPLIT = re.compile(r"(?<=[.!?])\s+(?=[A-Z0-9\"'(\[])")
 _MARKER = re.compile(r"\[\s*\d+\s*\]")
+# editorial tags left in Wikipedia text, e.g. "[citation needed]"; they glue sentences together and are not content
+_WIKI_TAG = re.compile(r"\[(?:citation|clarification|dubious|verification|when|who|where|according to whom)[^\]]*\]", re.I)
 _NUMBER = re.compile(r"\d[\d,]*(?:\.\d+)?")
 _QUOTED = re.compile(r"\"([^\"]{8,})\"")
 
@@ -35,7 +37,7 @@ def is_instruction_like(sentence: str) -> bool:
 
 
 def strip_markers(text: str) -> str:
-    out = re.sub(r"\s+", " ", _MARKER.sub("", text)).strip()
+    out = re.sub(r"\s+", " ", _WIKI_TAG.sub("", _MARKER.sub("", text))).strip()
     return re.sub(r"\s+([.!?,;])", r"\1", out)  # removing "[1]" before a full stop leaves a gap
 
 
