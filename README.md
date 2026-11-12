@@ -211,4 +211,4 @@ To regenerate or verify the README tables: `python docs/readme_tables.py --write
 
 ## Licence and data
 
-Code is mine. No licence file is attached yet because the repo is private. BEIR NQ is treated as non-commercial. Wikipedia dumps are GFDL and CC BY-SA 4.0.
+The code is available under either the MIT licence (`LICENSE-MIT`) or the Apache License 2.0 (`LICENSE-APACHE`), at your option. The data licences are separate and listed in `docs/data.md`: BEIR NQ is treated as non-commercial, Natural Questions is CC BY-SA 3.0. No data is shipped. Wikipedia dumps are GFDL and CC BY-SA 4.0.
