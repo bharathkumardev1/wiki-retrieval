@@ -8,26 +8,26 @@ A Go ingester turns a Wikipedia dump into passages with deterministic ids. Retri
 
 ## Compression costs quality until the re-score
 
-On the full corpus, IVF-PQ at 96 bytes per vector answers in 4.6 ms and holds 257 MB of codes against 4.12 GB of float vectors, and nDCG@10 falls from 0.402 to 0.371. On the 104,201-passage dev slice, adding the exact re-score step brings dense nDCG@10 back to within 0.0035 of exact search and the hybrid to within 0.0025, with paired intervals that exclude zero in both cases. I report those as costs. The re-score needs the float vectors in memory, so a served process holds the full matrix next to the codes. I have timed the refined configuration only on the slice, and I have no exact-search timing on the full corpus that I trust: the one I had was copied by hand from a screenshot, so it is out of the README until the rerun measures it.
+On the full corpus, IVF-PQ at 96 bytes per vector answers in 4.6 ms and holds 257 MB of codes against 4.12 GB of float vectors, and nDCG@10 falls from 0.402 to 0.371. On the 104,201-passage dev slice, adding the exact re-score step brings dense nDCG@10 back to within 0.0035 of exact search and the hybrid to within 0.0025, with paired intervals that exclude zero in both cases. I report those as costs. The re-score needs the float vectors in memory, so a served process holds the full matrix next to the codes. The refined configuration is timed only on the slice. Exact flat search over the full corpus takes 321 ms p50 on a 4-CPU host (`results/gpu_full_nq_paired_t4.json`), against 2.6 to 4.6 ms for the unrefined index.
 
 ## Mined negatives lost
 
 Hard negatives are the standard advice for contrastive fine-tuning. BM25-mined negatives came out behind random in-batch negatives (-0.0035 nDCG@10 [-0.0066, -0.0005]), and dense-mined negatives tied on nDCG@10 and fell behind on hit@10 (-0.0067 [-0.0116, -0.0020]). I kept the simple arm. Training loss was near 0.04 within 20 steps, which suggests the batches were too easy for any negative to matter, though I did not test that.
 
-## The judge that agreed with nothing
+## A lexical judge, then a cross-encoder gate
 
-My first answer-quality check was lexical overlap between a cited sentence and its passage. I labelled 300 answers by hand in two passes (the passes agree on 84% of rows, kappa 0.73) and compared. The judge called 194 of the 200 system answers supported, so its kappa against my labels, -0.006, is what a constant predictor scores. A cross-encoder scoring the question and the passage separated better (AUC 0.87 for not-supported against the rest), and I rebuilt that stage as a refusal gate. Cross-fitted over 40 random splits, it refuses 75.3% of the answers I labelled not supported and wrongly refuses 20.8% of acceptable ones. It scores relevance, so a wrong sentence from a relevant passage goes through.
+My first answer-quality check was lexical overlap between a cited sentence and its passage. I labelled 300 answers by hand in two passes (I recorded 84% agreement between the passes, kappa 0.73; the first pass is not shipped) and compared. The judge called 194 of the 200 system answers supported, so its kappa against my labels, -0.006, is what a constant predictor scores. A cross-encoder scoring the question and the passage separated better (AUC 0.87 for not-supported against the rest), and I rebuilt that stage as a refusal gate. Cross-fitted over 40 random splits, it refuses 75.3% of the answers I labelled not supported and wrongly refuses 20.8% of acceptable ones. It scores relevance, so a wrong sentence from a relevant passage goes through.
 
 Wiring the gate into the agent showed a second problem. On 300 sampled questions the lexical verifier answers 251. With the gate on, the agent answers 58. The label sheet scored one cited passage per answer and the agent requires every claim of an answer to clear the threshold, which explains a stricter result, but I never counted claims per answer. The threshold was fitted on the same sampled questions, so that run is in-sample. A gate whose sheet rates say 21% false refusals and whose agent refuses 80% needs a threshold fitted per claim before anyone should lean on its numbers.
 
-## Mistakes along the way
+## Bugs and corrections
 
 An evaluation script scored the same ranking twice for one depth setting and the reranker came out at nDCG@10 0.0003. That value could not be right. The fix is an assertion that every query has exactly one ranking, so a quieter version of the bug fails loudly.
 
 I first wrote in ADR 001 that the dev slice came from the Simple English dump. It is a slice of BEIR NQ, and the ADR now says so.
 
-The full-corpus adapter gain needed per-query scores for a paired test. A first Kaggle run saved them but only a summary survived, so I reran it with a script that prints its full result at the end. The paired gain is +0.014 nDCG@10 [+0.007, +0.021] and +0.043 recall@100: small in nDCG, clear in the test, with a p-value that does not account for picking the tuned arm among three on the same queries.
+The full-corpus adapter gain needed per-query scores for a paired test. The paired run writes per-query scores, and the shipped JSON holds the nDCG@10 arrays. The paired gain is +0.014 nDCG@10 [+0.007, +0.021] and +0.043 recall@100: small in nDCG, clear in the test, with a p-value that does not account for picking the tuned arm among three on the same queries.
 
-## Next
+## Where it goes next
 
 Refine and rerank at full-corpus scale come first, since both claims rest on the slice. After that: a per-claim gate threshold, a real language model as the drafter with the gate measured against it, a second annotator on the label sheet, and the Kubernetes manifests applied on a cluster that works. The README's "What is still rough" section lists the rest.
