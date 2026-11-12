@@ -4,22 +4,30 @@ The gate refuses when the cross-encoder score of (question, cited passage) is be
 Reported rates are cross-fitted: the threshold is chosen on one half of the system rows and scored
 on the other half. The threshold written to configs/answerability.json is chosen on all 200 system
 rows, so it has no held-out estimate of its own beyond the cross-fitted numbers below.
-python scripts/answerability_gate.py SHEET.csv JUDGE.csv"""
+The labels live in results/labels/answerability_labels.csv as ids and one label per row. The question and
+the passage text are looked up from the BEIR NQ queries and the dev corpus by id, so the labelled text is
+not redistributed.
+python scripts/answerability_gate.py results/labels/answerability_labels.csv data/nq data/dev"""
 import csv
 import json
 import sys
 from pathlib import Path
 
 import numpy as np
+import pyarrow.parquet as pq
 
+from wikiret.data import load_queries
 from wikiret.rerank import OnnxReranker
 
-sheet = list(csv.DictReader(open(sys.argv[1], encoding="utf-8-sig")))
-stratum = {r["row_id"]: r["stratum"] for r in csv.DictReader(open(sys.argv[2], encoding="utf-8-sig"))}
-rows = [r for r in sheet if stratum[r["row_id"]] == "system"]
+labels, nq, dev = Path(sys.argv[1]), Path(sys.argv[2]), Path(sys.argv[3])
+rows = [r for r in csv.DictReader(open(labels, encoding="utf-8-sig")) if r["stratum"] == "system"]
+qids, qtext = load_queries(nq / "queries.parquet")
+query = dict(zip(qids, qtext))
+corpus = pq.read_table(dev / "corpus.parquet", columns=["_id", "title", "text"]).to_pydict()
+passage = {i: f"{t} {x}" for i, t, x in zip(corpus["_id"], corpus["title"], corpus["text"])}
 rr = OnnxReranker("artifacts/reranker_int8")
-y = np.array([r["human_label"].strip().lower() for r in rows])
-s = np.array([rr(r["query"], [f"{r['passage_title']} {r['passage_text']}"])[0] for r in rows])
+y = np.array([r["label"] for r in rows])
+s = np.array([rr(query[r["query_id"]], [passage[r["passage_id"]]])[0] for r in rows])
 bad = y == "not supported"  # the answers the gate should refuse
 
 

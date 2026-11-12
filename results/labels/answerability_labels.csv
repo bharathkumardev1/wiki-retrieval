@@ -1,0 +1,301 @@
+row_id,stratum,query_id,passage_id,label
+7507a494,system,test1077,doc37399,partial
+48abf0d9,system,test1903,doc66842,partial
+2610788c,system,test145,doc5395,supported
+e7bdcbe2,system,test627,doc22389,partial
+5bf55bb4,control,test897,doc91224,not supported
+da8f7b80,system,test1400,doc49955,partial
+1227ceb6,system,test2968,doc895089,not supported
+83479aca,control,test2362,doc55025,not supported
+05ba7112,control,test2401,doc86082,not supported
+f7943a6f,control,test3223,doc45819,not supported
+34d3380c,system,test90,doc2549881,not supported
+0f2efaaa,system,test2829,doc97055,partial
+1b1ad948,system,test2565,doc88108,supported
+e9c08dfd,control,test1028,doc1050120,not supported
+c0450541,control,test921,doc72828,not supported
+e787bc5c,system,test671,doc156817,supported
+a4d2e733,system,test1199,doc42673,supported
+7816e46d,system,test727,doc777123,not supported
+f60265d5,system,test236,doc1159648,not supported
+ccb1fdbe,system,test1033,doc1651048,not supported
+3e436562,control,test2484,doc56228,not supported
+c3c408b5,control,test535,doc41390,not supported
+5a33b4f3,system,test2792,doc1352162,partial
+29a168a7,system,test964,doc34056,supported
+f51bad75,system,test1713,doc60822,partial
+71ac193b,control,test2481,doc50490,not supported
+d17dfe7f,control,test243,doc22389,not supported
+24ef6b9c,control,test2455,doc64449,not supported
+40b750dc,control,test368,doc1153188,not supported
+2da323ae,system,test2407,doc1952468,not supported
+f85b6aa3,system,test3400,doc115844,partial
+2adf7e68,control,test2309,doc2291752,not supported
+929ed883,control,test1574,doc32788,not supported
+e919e8c9,control,test60,doc31419,not supported
+c7426cc3,system,test2689,doc100822,not supported
+9e10356a,system,test2044,doc71245,supported
+34b441f1,system,test3210,doc109785,partial
+ed11f419,control,test193,doc26059,not supported
+5b0f23d9,control,test1460,doc66842,not supported
+d9c4b10b,system,test436,doc16157,supported
+5235af77,system,test104,doc3821,partial
+3a47ffd6,system,test3238,doc2024425,not supported
+1bdd01b1,system,test2271,doc1030211,not supported
+ada677d4,control,test2786,doc46943,not supported
+96e1294d,control,test519,doc110297,not supported
+cce6a4fc,system,test246,doc9074,not supported
+5248983d,system,test1050,doc36709,partial
+26a45bcf,control,test1417,doc61001,not supported
+d0098be1,system,test763,doc1045422,not supported
+775da67a,control,test3031,doc219813,not supported
+745b5166,system,test2154,doc293068,not supported
+7206df57,control,test3299,doc33199,not supported
+81599011,system,test1755,doc61865,supported
+eaeb1219,control,test3115,doc17395,not supported
+53ed373d,control,test2977,doc61036,not supported
+c3de3bbe,control,test1290,doc1045422,not supported
+838f39c1,system,test2356,doc1246427,not supported
+03575580,system,test83,doc1587176,not supported
+5769bd2a,system,test3107,doc106305,partial
+a4e3ef6d,control,test1677,doc17092,not supported
+5322e2fe,system,test1412,doc50401,partial
+a8cc968a,system,test284,doc1940392,partial
+eee2f480,system,test2903,doc99139,supported
+f38e8991,system,test839,doc30337,supported
+2bb9adb8,system,test1839,doc59865,not supported
+2c3e6b40,system,test1477,doc2450785,not supported
+666c8515,system,test1719,doc60993,supported
+9281788f,system,test1541,doc450108,partial
+ac27584c,control,test2477,doc105117,not supported
+480f7246,system,test2724,doc16745,partial
+ead799b6,system,test1563,doc55878,supported
+519e035f,system,test2644,doc65635,not supported
+9ad65cb5,system,test201,doc2106896,not supported
+bbad2355,system,test285,doc784935,partial
+63e2f9ff,control,test576,doc840649,not supported
+3c625837,system,test558,doc80738,supported
+d29c83f1,system,test3158,doc107852,supported
+77eb9d93,control,test2660,doc19347,not supported
+def225b6,system,test1073,doc2075378,not supported
+1dbb2564,control,test1424,doc2391074,not supported
+352a662d,system,test2995,doc1653896,not supported
+433351c6,control,test544,doc1678345,not supported
+0d5a5335,system,test1907,doc66913,partial
+e87bb5d6,system,test67,doc1927,partial
+b66ed2d2,control,test464,doc64449,not supported
+cb01f271,control,test1449,doc1153188,not supported
+1bcf999f,system,test2757,doc1619805,partial
+c2da8900,control,test1330,doc119326,not supported
+5ccb90c6,system,test506,doc18536,partial
+1b713c91,system,test3436,doc2065964,not supported
+e307967c,system,test3062,doc104835,partial
+8765d969,control,test918,doc85260,not supported
+4570e1ef,system,test628,doc2044054,not supported
+bc72e2b5,system,test511,doc18778,partial
+7074a606,system,test433,doc2393622,not supported
+ce5c5957,system,test1490,doc1700412,not supported
+5a6f7024,system,test2320,doc80067,partial
+ff8bc16f,control,test182,doc30337,not supported
+cca1800e,control,test618,doc106305,not supported
+e41e71e6,control,test2464,doc97055,not supported
+7b8335ec,system,test46,doc1197859,not supported
+95bbd529,system,test2790,doc95927,supported
+2956513a,control,test2092,doc668602,not supported
+9f6168ba,system,test251,doc2407412,partial
+b6754f17,system,test930,doc33199,supported
+9ba3c6c4,system,test1788,doc1183802,not supported
+186e3e46,system,test2838,doc97296,not supported
+b1ca15f0,system,test1232,doc1151485,not supported
+f29144c2,system,test2579,doc88507,supported
+8c5c57fe,control,test1137,doc113214,not supported
+cb2f07b1,system,test3330,doc113756,supported
+a7c803c1,system,test2100,doc72957,supported
+1dbf98cd,control,test3419,doc1364256,not supported
+0de79b1e,system,test971,doc1167797,partial
+c47b9602,control,test1183,doc96827,not supported
+5f81718b,control,test1799,doc52262,not supported
+a5f433a7,control,test2570,doc77287,not supported
+6a06db8a,system,test1696,doc60175,supported
+8c02056d,system,test30,doc824,supported
+c3e2e516,control,test429,doc79719,not supported
+a5669276,system,test1717,doc1153188,not supported
+a1a0bae0,system,test107,doc3864,partial
+1cc98c6e,system,test1101,doc38531,partial
+11a804cf,system,test2650,doc861922,partial
+181e8f7f,system,test1877,doc65917,supported
+0d3a0e62,control,test2576,doc1352162,not supported
+f7aa1ea8,control,test3357,doc16745,not supported
+c94a8fd5,system,test2285,doc79236,partial
+dd88aa51,system,test1466,doc52262,partial
+22254467,system,test3024,doc12910,not supported
+9a1161c6,control,test783,doc55731,not supported
+bccbc8ff,system,test423,doc15739,supported
+53f4ad28,system,test42,doc1118,supported
+a3f14f8b,control,test2751,doc293068,not supported
+6e5adbaa,system,test3290,doc112562,supported
+3d6f83a4,system,test2535,doc1668753,not supported
+401a6a2e,control,test2068,doc71032,not supported
+eaced899,control,test2224,doc34056,not supported
+4ad8b307,system,test2433,doc84041,not supported
+1911cda4,control,test1838,doc66842,not supported
+4b7efbb1,control,test2281,doc651823,not supported
+b3db0d78,system,test137,doc662298,not supported
+1c0608ba,system,test3072,doc105117,partial
+657187fc,system,test2036,doc76491,not supported
+11b94879,system,test3289,doc1036255,not supported
+ee556404,system,test1479,doc52676,partial
+7af6d28d,system,test952,doc475353,partial
+710f01f9,control,test2245,doc69946,not supported
+a0e31bf9,control,test109,doc2407412,not supported
+64308d8a,system,test857,doc30706,supported
+9fa884da,control,test1723,doc55025,not supported
+baa091c1,system,test841,doc30365,supported
+87dffc2e,system,test1359,doc1939514,partial
+9c9216cb,control,test2045,doc106584,not supported
+9bd0e58a,system,test2363,doc81797,not supported
+6e2d6004,control,test1026,doc2317946,not supported
+eb90c5dd,control,test291,doc18404,not supported
+7d698ebf,system,test1164,doc564970,not supported
+f314d646,system,test3079,doc105300,partial
+e2b48e30,system,test3181,doc376569,partial
+74fc73ee,system,test2326,doc80287,supported
+bf2a1454,system,test3117,doc106703,partial
+11166217,system,test14,doc2049647,partial
+c3e5e78f,control,test1307,doc682917,not supported
+8dec36c9,system,test249,doc2379047,not supported
+311ce36b,system,test2690,doc92227,partial
+66ae3a42,system,test1264,doc44787,partial
+275b01a3,control,test1615,doc85013,not supported
+da50ca7b,system,test557,doc92940,partial
+160d903a,system,test2612,doc89451,supported
+9048fa50,system,test1537,doc55025,partial
+76ecdf20,system,test3271,doc2312613,not supported
+f4acac6c,system,test1422,doc2212791,not supported
+e0b1f58b,control,test1619,doc65917,not supported
+8fcda588,system,test2454,doc84651,partial
+252191c4,system,test2756,doc94874,partial
+b13545ea,system,test2777,doc95335,not supported
+3430e468,control,test1785,doc102942,not supported
+2ec5f826,control,test11,doc58998,not supported
+4bc9abc1,system,test1123,doc119326,supported
+4300b342,system,test2306,doc79661,supported
+90c81f49,control,test878,doc1701846,not supported
+b49a0a04,system,test2698,doc92416,supported
+e7352209,control,test3178,doc91527,not supported
+30d9ae7a,control,test2057,doc363836,not supported
+37e1c7ef,system,test2486,doc950390,partial
+8f6be9fe,system,test360,doc13815,supported
+3214d383,system,test2229,doc77536,partial
+804b3704,system,test3160,doc14563,not supported
+c6866c29,system,test1168,doc41390,partial
+a929290b,system,test2672,doc91527,not supported
+e3dacb90,system,test3446,doc95028,not supported
+6d770b36,system,test2492,doc86082,not supported
+d69732d0,system,test3076,doc2614104,partial
+0fe0a3d6,system,test2696,doc92407,partial
+c8a93852,control,test2520,doc56216,not supported
+752f33da,system,test2151,doc589356,not supported
+c7853021,control,test2458,doc1631,not supported
+dde575fe,system,test2501,doc76113,not supported
+f41ede6e,control,test2035,doc903414,not supported
+98a93ed1,system,test3259,doc1682542,not supported
+1ab0c6f6,system,test1718,doc60960,supported
+bc13931a,system,test1800,doc63378,partial
+99654229,control,test1637,doc16745,not supported
+381f1c49,system,test303,doc1701846,not supported
+3d16113d,system,test21,doc1000870,not supported
+eecd65e2,system,test2146,doc74730,supported
+e76ff9cb,system,test1326,doc46943,not supported
+a1b623ba,system,test98,doc3201,not supported
+c3f41099,control,test455,doc103708,not supported
+fe37c9d7,system,test4,doc42,partial
+fff00796,control,test1222,doc59865,not supported
+50f469df,system,test409,doc1799494,not supported
+bc66427f,system,test1679,doc59485,supported
+232dc02d,control,test1378,doc219813,not supported
+b17c3197,system,test1672,doc59157,partial
+545e1b2e,control,test3221,doc74727,not supported
+1522af53,system,test190,doc6945,partial
+af075013,system,test2604,doc89227,not supported
+faba1f35,control,test2211,doc85260,not supported
+5adfec30,system,test474,doc17395,partial
+cad2d40c,system,test3326,doc1781080,not supported
+c297b0e2,system,test2418,doc83462,not supported
+c756af89,control,test1467,doc1619805,not supported
+e58da7a0,system,test2358,doc800578,partial
+f864616b,control,test282,doc6649,not supported
+3a9aa49d,system,test2697,doc92410,partial
+df512066,system,test395,doc14779,partial
+953a7c9a,system,test2958,doc1076059,partial
+b30a80e1,system,test3190,doc108821,partial
+35a565be,system,test1405,doc1493215,not supported
+41a4db55,system,test3192,doc418439,supported
+c319765a,control,test82,doc2391074,not supported
+aa547e0d,system,test2348,doc476805,partial
+faa48d1c,system,test85,doc2735,partial
+04236929,control,test1575,doc100822,not supported
+5145f209,control,test1542,doc46943,not supported
+ce597aba,control,test230,doc9074,not supported
+a5296f8f,system,test443,doc16510,supported
+e924f2d0,system,test2491,doc86031,not supported
+dfc8f0a4,system,test2384,doc74727,supported
+2522ae23,system,test2043,doc71236,supported
+9e4a1611,system,test3209,doc109630,partial
+59e608ba,system,test3200,doc102942,partial
+63311d17,system,test3085,doc105428,supported
+4500d20e,system,test728,doc26059,supported
+9fe15604,control,test3263,doc18404,not supported
+78a39d87,control,test1721,doc1627611,not supported
+7fd1a30d,control,test2343,doc71235,not supported
+d9ad7860,system,test2295,doc79516,not supported
+bd3fa4ab,system,test1170,doc41457,partial
+e4415b00,system,test1557,doc55731,not supported
+39101242,system,test1995,doc69946,partial
+14e28109,control,test3256,doc109630,not supported
+1816ab98,control,test1331,doc85013,not supported
+52a054bf,control,test1748,doc2147616,not supported
+19fc7e27,system,test919,doc32705,supported
+e9249a2f,system,test1571,doc56052,supported
+e55afb0b,system,test1118,doc2574381,not supported
+f334ae2f,system,test3108,doc106332,partial
+f4475fa3,system,test2095,doc72828,not supported
+3ff78d29,system,test84,doc25700,partial
+7ebd495d,control,test949,doc32263,not supported
+5adf9216,control,test612,doc85013,not supported
+8e8a70ab,control,test1834,doc156817,not supported
+42498770,system,test45,doc1741143,not supported
+3076fd0c,system,test3148,doc107524,not supported
+6e7045a6,system,test2270,doc1859891,not supported
+553c61e5,system,test3438,doc117062,not supported
+cf4832f2,system,test590,doc21208,supported
+9cbf587e,system,test1229,doc43666,supported
+2dac1c6e,control,test500,doc3190,not supported
+257dea20,system,test1732,doc61324,partial
+36107b6a,system,test2677,doc1934268,not supported
+8479f1c9,control,test2962,doc116465,not supported
+0d5ffd15,control,test3224,doc27993,not supported
+cccff18a,system,test359,doc2317946,not supported
+a192001c,system,test2783,doc1064350,partial
+1aa46c92,system,test2387,doc82486,partial
+b69faf2a,system,test2318,doc705666,not supported
+eeb1bd7d,system,test1694,doc60092,partial
+07c24f1c,system,test317,doc12091,partial
+b2fc0224,system,test170,doc2020935,not supported
+b9b3bbc4,control,test2469,doc16745,not supported
+3d2fc35c,system,test2116,doc1963900,not supported
+d80e8d65,system,test3311,doc124735,not supported
+9d36dc76,system,test673,doc32263,not supported
+d3e1396c,system,test3078,doc105239,supported
+91594103,system,test2959,doc101227,partial
+2d28479f,control,test1667,doc84797,not supported
+09cb761c,system,test625,doc22255,supported
+2b5bc20b,control,test1525,doc20813,not supported
+6644f845,system,test28,doc787,partial
+a94bde6c,control,test2204,doc824,not supported
+081e2061,control,test1832,doc66842,not supported
+0ccf6efc,control,test2620,doc69946,not supported
+fa48bee4,system,test2821,doc96827,not supported
+f49f4042,system,test3316,doc113214,not supported
+792f9957,system,test2299,doc649,not supported
+2bac6575,system,test1403,doc50109,partial
