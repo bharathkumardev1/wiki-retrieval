@@ -1,4 +1,4 @@
-# 001. Evaluate on BEIR Natural Questions, develop on a Simple English slice
+# 001. Evaluate on BEIR Natural Questions, develop on a 104,201 passage slice of it
 
 Status: accepted
 
@@ -10,4 +10,4 @@ The licence on BEIR NQ is unclear. The Hugging Face card for BeIR/nq says cc-by-
 ## Decision
 Final numbers come from the full BEIR NQ corpus and all 3,452 test queries. Ablations and training runs iterate on a 104,201 passage slice of that same corpus (`scripts/make_dev_corpus.py`): every passage judged relevant to any test query, plus 100,000 seeded random distractors. The Go ingester and the Simple English Wikipedia dump are a separate path. They exercise the ingestion code and have no labelled queries, so no retrieval number comes from them.
 
-The slice is far easier than the full corpus. BM25 nDCG@10 is 0.68 there and 0.31 on the full corpus, so slice numbers are never compared with full-corpus ones. Every results file names the corpus it ran on, and the README keeps the two sets of numbers in separate tables.
+The slice is far easier than the full corpus. BM25 nDCG@10 is 0.68 there and 0.29 on the full corpus (default settings), so slice numbers are never compared with full-corpus ones. Every results file names the corpus it ran on, and the README keeps the two sets of numbers in separate tables.

@@ -29,7 +29,7 @@ The corpus licence on BEIR NQ is contradictory (the Hugging Face cards say both 
 
 ## Results
 
-Two corpora appear below and they are never compared. The full corpus is the one comparable to published BEIR numbers. The dev slice is every judged passage plus 100,000 random distractors (104,201 passages), which is much easier: BM25 scores 0.68 there and 0.31 on the full corpus. I ran the full corpus on a Kaggle T4 for encoding. The dev slice runs on a 2 vCPU container, which is where the paired tests and latency numbers come from.
+Two corpora appear below and they are never compared. The full corpus is the one comparable to published BEIR numbers. The dev slice is every judged passage plus 100,000 random distractors (104,201 passages), which is much easier: BM25 scores 0.68 there and 0.29 on the full corpus (default settings). I ran the full corpus on a Kaggle T4 for encoding. The dev slice runs on a 2 vCPU container, which is where the paired tests and latency numbers come from.
 
 ### Full corpus
 
