@@ -1,16 +1,16 @@
 # wiki-retrieval
 
-A passage search service over Natural Questions text from Wikipedia: BM25, a LoRA-tuned bi-encoder, compressed vector search with exact re-scoring, an INT8 cross-encoder reranker, and a small agent that answers with a cited passage or refuses.
+A passage search service over Natural Questions text from Wikipedia. It fuses BM25 with a LoRA-tuned bi-encoder, searches vectors through a compressed index that exact vectors re-score, and can rerank the head with an INT8 cross-encoder. A small agent on top answers with a cited passage or refuses.
 
 - **Full corpus (2,681,468 passages, 3,452 queries), dense-only exact search:** nDCG@10 0.402 for the LoRA bi-encoder against 0.290 for my BM25 with Lucene defaults.
 - **LoRA against the untuned encoder, paired:** +0.014 nDCG@10 [+0.007, +0.021] on the full corpus, permutation p 0.00012. Small and clearly not noise.
 - **Dev slice (104,201 passages):** the served hybrid scores 0.783 and the INT8 cross-encoder lifts it to 0.877, about 800 ms per query.
 - **Two corpora, never compared:** the dev slice is much easier than the full corpus, and I have not measured the hybrid or the reranker on the full corpus.
-- **Scope:** the FastAPI service (`/healthz`, `POST /v1/search`, `/metrics`) does search, cache and rerank. The LangGraph agent runs from `scripts/agent_demo.py` and `scripts/agent_smoke.py` only. The API does not call it and the Docker image does not include it.
+- **Scope:** the FastAPI service (`/healthz`, `POST /v1/search`, `/metrics`) handles search, the semantic cache and the rerank. The LangGraph agent runs from `scripts/agent_demo.py` and `scripts/agent_smoke.py` only. The API does not call it and the Docker image does not include it.
 
 Text in the examples and tables comes from Wikipedia (CC BY-SA) by way of BEIR Natural Questions.
 
-**Demo.** No hosted demo. The repo is private and the service runs locally (see "Run it"). This session came from the LoRA adapter I trained; the untuned quickstart in "Run it" returns the same top results for this query. A captured session:
+**Demo.** No hosted demo. The repo is private and the service runs locally (see "Reproducing the tables and serving it"). This session came from the LoRA adapter I trained; the untuned quickstart under "Reproducing the tables and serving it" returns the same top results for this query. A captured session:
 
 ```
 $ python -m wikiret.serve &            # dev slice, 104,201 passages, LoRA adapter, INT8 reranker on the top 20
@@ -33,7 +33,7 @@ All numbers below are component results, each on the corpus named. BM25 reaches 
 
 The LoRA gain is +0.040 [+0.033, +0.047] nDCG@10 on the dev slice and +0.014 on the full corpus, both from paired tests. The recall@100 gain on the full corpus is larger, +0.043 [+0.034, +0.052]. The untuned score in the paired run is 0.3883 and the 0.389 above comes from an earlier run of the same encoder. The tuned arm was picked from three trained on the same test queries, so the p-values are not adjusted for that choice. The shipped `results/gpu_full_nq_paired_t4.json` holds per-query nDCG@10 arrays only, so the recall@100 p-value (1e-05) cannot be recomputed from the repo; the Kaggle script now writes every per-query metric for future runs.
 
-## Results
+## Measured results
 
 Two corpora appear below and they are never compared. The full corpus is the one comparable to published BEIR numbers. The dev slice is every judged passage plus 100,000 random distractors (104,201 passages), which is much easier: tuned BM25 scores 0.68 there (k1 0.9 and b 0.4 were chosen on 500 of the 3,452 queries, which favours BM25 slightly) against 0.309 tuned and 0.290 with defaults on the full corpus. I ran the full corpus on a Kaggle T4 for encoding. The dev slice runs on a 2 vCPU container, which is where the paired tests and latency numbers come from.
 
@@ -95,7 +95,7 @@ Compressed search with exact re-scoring costs 0.0025 nDCG@10 against exact hybri
 | Cross-encoder, 20 candidates, fp32, 150 queries | 1103 | 1230 | 1338 |
 <!-- /table:latency -->
 
-Latency is per stage on 2 vCPU, one query at a time. The 150-query rows ran with no other job going. The all-queries INT8 row has the same median and a much longer tail (p95 1,848 ms, p99 2,007 ms), and I do not know how much of that is host noise; plan around it. A 20-candidate rerank at about 800 ms is too slow for every request without a GPU or a shorter candidate list. Reranking the top 10 gives 0.859 nDCG@10 against 0.877 for the top 20 (`results/dev_rerank_lora_easy.json`). The service reranks the top 20 whenever a reranker is loaded (`WIKIRET_RERANK_DEPTH`), and `WIKIRET_RERANKER_DIR=` with an empty value turns it off. Whole-service load numbers are under "What is still rough".
+Latency is per stage on 2 vCPU, one query at a time. The 150-query rows ran with no other job going. The all-queries INT8 row has the same median and a much longer tail (p95 1,848 ms, p99 2,007 ms), and I do not know how much of that is host noise; plan around it. A 20-candidate rerank at about 800 ms is too slow for every request without a GPU or a shorter candidate list. Reranking the top 10 gives 0.859 nDCG@10 against 0.877 for the top 20 (`results/dev_rerank_lora_easy.json`). The service reranks the top 20 whenever a reranker is loaded (`WIKIRET_RERANK_DEPTH`), and `WIKIRET_RERANKER_DIR=` with an empty value turns it off. Whole-service load numbers are under "Known gaps".
 
 ### LoRA and hard negatives
 
@@ -141,7 +141,7 @@ The cross-fitted rates come from 40 random splits, each fitting the threshold on
 
 The drafter in the smoke test copies sentences from the retrieved passages. I tried Qwen2.5-0.5B-Instruct as the drafter on 5 questions with the lexical verifier (`results/agent_demo_qwen.json`): the agent refused all 5, after empty drafts, drafts with no citation or claims the cited passage did not support, at 49 to 84 seconds per question on 2 vCPUs. Five questions say nothing about a rate. The agent takes any generator, and I have not evaluated a real LLM drafter.
 
-## Architecture
+## How it is wired
 
 ```
 Simple English / enwiki dump (.bz2)
@@ -160,7 +160,7 @@ query -> BM25 (numpy, Lucene idf)  --------------------\
 
 `src/wikiret/` holds the library: `index.py` (hybrid index and version digest), `cache.py`, `service.py` (FastAPI, `/healthz`, `POST /v1/search`, `/metrics`), `rerank.py`, `serve.py` (env-configured entry point) and `agent/` (verifier, answerability gate, LangGraph wiring). `scripts/` holds every evaluation as a command that writes a file into `results/`. `kaggle/` holds the three GPU notebooks' source.
 
-## Decisions
+## Choices and reasons
 
 Each has an ADR in `docs/adr/` with the alternatives I considered and the numbers behind the choice.
 
@@ -171,7 +171,7 @@ Each has an ADR in `docs/adr/` with the alternatives I considered and the number
 - **IVF-PQ with exact refine** (005). Compressed codes pick 1,000 candidates and exact float32 vectors re-score them. The dev-slice setting is nlist 1024, 48 bytes per vector, nprobe 256, chosen on the dev slice and not re-tuned for the full corpus.
 - **Verify and refuse** (006), **ONNX reranker** (007), **answerability gate** (008).
 
-## Run it
+## Reproducing the tables and serving it
 
 CI runs the Python tests on 3.11 and 3.13 (ruff checks syntax errors, pyflakes, import order, pycodestyle E4/E7 and bugbear). On a machine without a GPU, install the CPU build of torch first, because `sentence-transformers` otherwise pulls the multi-gigabyte CUDA build:
 
@@ -195,11 +195,11 @@ make serve-untuned   # http://localhost:8000, POST /v1/search
 
 To regenerate or verify the README tables: `python docs/readme_tables.py --write` and `--check`.
 
-## What is still rough
+## Known gaps
 
-- **The full-corpus adapter gain is small, 0.014 nDCG@10.** It is clearly above noise in the paired test, but the tuned arm was chosen among three on the test queries, so the p-value ignores that selection.
+- **The full-corpus adapter gain is small, 0.014 nDCG@10.** The paired test puts it above noise (see the detail under the headline numbers).
 - **Refine and rerank are measured on the dev slice only,** and the full-corpus hybrid has no number at all.
-- **The gate over-refuses inside the agent.** It answers 58 of 300 questions (see the agent table), and the threshold was fitted on the same sampled questions.
+- **The gate over-refuses inside the agent.** It answers 58 of 300 questions (see the agent table in "Cited answers and refusal").
 - **Service load numbers are synthetic.** They come from a 2 vCPU container, one request at a time, with the load generator sharing the same two CPUs (`results/loadtest.json`). Without the semantic cache, retrieval alone answers at p50 16.5 to 18.4 ms and p95 about 21 to 22 ms (about 54 to 59 requests per second). With the INT8 reranker on the top 20 it answers at p50 871 to 916 ms, p95 about 1,000 ms and p99 1,076 to 1,120 ms (about 1.1 requests per second). With the cache on, a fresh start and 30% generated repeats, p50 was 750 to 824 ms and p99 1.0 to 1.3 s, with 38 to 44 of 100 requests served from the cache. Nothing was measured above concurrency 1, on a real traffic mix or on a bigger machine.
 - **The Kubernetes manifests have never been applied.** `kind create cluster` fails in my cloud sandbox with a nested-container error, so they have only passed schema validation. Terraform was applied and destroyed against LocalStack only (4 resources). The GitHub Actions jobs (python, go, image build, terraform) were green on the latest push.
 - **Labels come from one person,** who is also the author.

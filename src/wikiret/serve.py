@@ -80,7 +80,7 @@ def load_index(cfg: Config) -> HybridIndex:
     vectors = cfg.data_dir / f"emb_{cfg.tag}.npy"
     for p in (corpus, vectors):
         if not p.exists():
-            raise FileNotFoundError(f"{p} not found; README section \"Run it\" lists the commands that build it (make dev-data)")
+            raise FileNotFoundError(f"{p} not found; README section \"Reproducing the tables and serving it\" lists the commands that build it (make dev-data)")
     t = pq.read_table(corpus, columns=["_id", "title", "text"])
     emb = np.load(vectors).astype(np.float32)
     return HybridIndex(

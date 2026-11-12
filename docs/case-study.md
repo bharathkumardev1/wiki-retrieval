@@ -20,7 +20,7 @@ My first answer-quality check was lexical overlap between a cited sentence and i
 
 Wiring the gate into the agent showed a second problem. On 300 sampled questions the lexical verifier answers 251. With the gate on, the agent answers 58. The label sheet scored one cited passage per answer and the agent requires every claim of an answer to clear the threshold, which explains a stricter result, but I never counted claims per answer. The threshold was fitted on the same sampled questions, so that run is in-sample. A gate whose sheet rates say 21% false refusals and whose agent refuses 80% needs a threshold fitted per claim before anyone should lean on its numbers.
 
-## Bugs and corrections
+## Errors I found in my own work
 
 An evaluation script scored the same ranking twice for one depth setting and the reranker came out at nDCG@10 0.0003. That value could not be right. The fix is an assertion that every query has exactly one ranking, so a quieter version of the bug fails loudly.
 
@@ -28,6 +28,6 @@ I first wrote in ADR 001 that the dev slice came from the Simple English dump. I
 
 The full-corpus adapter gain needed per-query scores for a paired test. The paired run writes per-query scores, and the shipped JSON holds the nDCG@10 arrays. The paired gain is +0.014 nDCG@10 [+0.007, +0.021] and +0.043 recall@100: small in nDCG, clear in the test, with a p-value that does not account for picking the tuned arm among three on the same queries.
 
-## Where it goes next
+## Open questions and next runs
 
-Refine and rerank at full-corpus scale come first, since both claims rest on the slice. After that: a per-claim gate threshold, a real language model as the drafter with the gate measured against it, a second annotator on the label sheet, and the Kubernetes manifests applied on a cluster that works. The README's "What is still rough" section lists the rest.
+Refine and rerank at full-corpus scale come first, since both claims rest on the slice. After that I want a per-claim gate threshold and a second annotator on the label sheet. The drafter should become a real language model with the gate measured against it. The Kubernetes manifests still need a cluster that works. The README section "Known gaps" lists the rest.
