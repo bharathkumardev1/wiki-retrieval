@@ -1,14 +1,14 @@
 # wiki-retrieval
 
-A passage search service over Wikipedia text (BM25, a LoRA-tuned bi-encoder, compressed vector search, a cross-encoder reranker) with a small agent that answers with a cited passage or refuses.
+A passage search service over Natural Questions text from Wikipedia: BM25, a LoRA-tuned bi-encoder, compressed vector search with exact re-scoring, an INT8 cross-encoder reranker, and a small agent that answers with a cited passage or refuses.
 
-**The problem.** Which stages of a search stack earn their latency and memory? The repo builds one over 2,681,468 passages from BEIR Natural Questions, a corpus big enough that approximate search is a real trade-off, and measures each stage against the one before it.
+- **Full corpus (2,681,468 passages, 3,452 queries), dense-only exact search:** nDCG@10 0.402 for the LoRA bi-encoder against 0.290 for my BM25 with Lucene defaults.
+- **LoRA against the untuned encoder, paired:** +0.014 nDCG@10 [+0.007, +0.021] on the full corpus, permutation p 0.00012. Small and clearly not noise.
+- **Dev slice (104,201 passages):** the served hybrid scores 0.783 and the INT8 cross-encoder lifts it to 0.877, about 800 ms per query.
+- **Two corpora, never compared:** the dev slice is much easier than the full corpus, and I have not measured the hybrid or the reranker on the full corpus.
+- **Scope:** the FastAPI service (`/healthz`, `POST /v1/search`, `/metrics`) does search, cache and rerank. The LangGraph agent runs from `scripts/agent_demo.py` and `scripts/agent_smoke.py` only. The API does not call it and the Docker image does not include it.
 
-**What it does.** BM25 and a MiniLM bi-encoder with a LoRA adapter are fused by reciprocal rank. FAISS IVF-PQ picks candidates and exact float32 vectors re-score them. An INT8 ONNX cross-encoder can rerank the head. FastAPI serves it with a semantic cache and Prometheus metrics, and a LangGraph agent drafts a cited answer, verifies every cited sentence, and refuses when verification fails.
-
-**Headline result.** These are component results, each on the corpus named. On the full corpus (2,681,468 passages, 3,452 test queries) with dense-only, exact search, the LoRA bi-encoder reaches nDCG@10 0.402 [0.390, 0.414] and the untuned encoder 0.389. BM25 reaches 0.290 [0.278, 0.302] with Lucene defaults and 0.309 [0.295, 0.322] tuned, scored on the 2,952 queries not used for tuning (defaults score 0.295 on those same queries). I have not measured the full-corpus hybrid (BM25 plus dense with IVF-PQ and exact refine) or the reranker. On a 104,201-passage dev slice that fits a 2 vCPU container, the served hybrid scores 0.783 and the INT8 cross-encoder lifts it to 0.877 (paired gain +0.094 [+0.086, +0.102]) at about 800 ms per query. The slice is much easier than the full corpus, so those two sets of numbers are never compared. Unrefined IVF-PQ over the full corpus answers in 2.6 to 4.6 ms (nprobe 64, no exact re-score) and gives up 0.03 to 0.07 nDCG@10 against exact search; exact flat search over the same vectors takes about 321 ms p50 on that host.
-
-The LoRA adapter's gain over the untuned encoder is +0.040 [+0.033, +0.047] nDCG@10 on the dev slice and +0.014 [+0.007, +0.021] on the full corpus, both from paired tests. The full-corpus gain is small and statistically clear (permutation p 0.00012). The recall@100 gain is larger, +0.043 [+0.034, +0.052]. The untuned score in that paired run is 0.3883, and 0.389 in the table above comes from an earlier run of the same encoder; the 0.0007 gap is run-to-run variation I did not chase. The tuned arm was picked from three trained on the same test queries, so the p-values are not adjusted for that choice.
+Text in the examples and tables comes from Wikipedia (CC BY-SA) by way of BEIR Natural Questions.
 
 **Demo.** No hosted demo. The repo is private and the service runs locally (see "Run it"). This session came from the LoRA adapter I trained; the untuned quickstart in "Run it" returns the same top results for this query. A captured session:
 
@@ -26,6 +26,12 @@ $ curl -s localhost:8000/v1/search -H 'content-type: application/json' \
 That is the first request after start on a shared 2 vCPU container: 1.56 s wall. `timings_ms` covers retrieval only, so the rest is the query encoder, the rerank of 20 candidates and first-request warm-up. The same query again is a cache hit and took 32 ms. Text is cut to 60 characters here and the service returns up to 400.
 
 The corpus licence on BEIR NQ is contradictory (the Hugging Face cards say both cc-by-sa-4.0 and cc-by-nc-sa-3.0), so I treat it as non-commercial and ship scripts and no data. `docs/data.md` lists every source.
+
+### Headline numbers in detail
+
+All numbers below are component results, each on the corpus named. BM25 reaches 0.290 [0.278, 0.302] with Lucene defaults and 0.309 [0.295, 0.322] tuned, scored on the 2,952 queries not used for tuning (defaults score 0.295 on those same queries). The untuned encoder scores 0.389 on the full corpus. On the dev slice the served hybrid scores 0.783 and the reranker adds +0.094 [+0.086, +0.102], paired. Unrefined IVF-PQ over the full corpus answers in 2.6 to 4.6 ms (nprobe 64, no exact re-score) and gives up 0.03 to 0.07 nDCG@10 against exact search, which takes about 321 ms p50 on that host.
+
+The LoRA gain is +0.040 [+0.033, +0.047] nDCG@10 on the dev slice and +0.014 on the full corpus, both from paired tests. The recall@100 gain on the full corpus is larger, +0.043 [+0.034, +0.052]. The untuned score in the paired run is 0.3883 and the 0.389 above comes from an earlier run of the same encoder. The tuned arm was picked from three trained on the same test queries, so the p-values are not adjusted for that choice. The shipped `results/gpu_full_nq_paired_t4.json` holds per-query nDCG@10 arrays only, so the recall@100 p-value (1e-05) cannot be recomputed from the repo; the Kaggle script now writes every per-query metric for future runs.
 
 ## Results
 
@@ -62,7 +68,7 @@ The IVF-PQ rows have no exact re-scoring, so they show what the compressed codes
 | IVF-PQ 96 B/vector, nprobe 64, one query | 4.61 ms | 257 MB of codes, no refine |
 <!-- /table:full_corpus_cost -->
 
-The IVF-PQ timings are single-query medians on a 4-CPU Kaggle host. The exact-search row was timed on that same host by `kaggle/full_nq_paired.py` (p50 322.95 ms untuned and 321.16 ms tuned; the table shows the tuned arm). The IVF-PQ rows are the unrefined index at nprobe 64. The configuration that recovers the quality (nprobe 256, 1,000 candidates, exact refine) was measured on the dev slice, where its dense stage takes 1.26 ms p50, and I have not timed it on the full corpus. Refinement needs the float32 vectors in memory, so a served instance holds the 4.12 GB matrix next to the codes and process memory goes up.
+The IVF-PQ timings are single-query medians on a 4-CPU Kaggle host. The exact-search row was timed on that same host by `kaggle/full_nq_paired.py` (p50 322.95 ms untuned and 321.16 ms tuned; the table shows the tuned arm). The IVF-PQ rows are the unrefined index at nprobe 64. The configuration that recovers the quality (nprobe 256, 1,000 candidates, exact refine) was measured on the dev slice, where its dense stage takes 1.26 ms p50, and it is not timed on the full corpus. Compression speeds search and does not shrink a served process: refinement needs the float32 vectors, so an instance holds the 4.12 GB matrix next to the codes.
 
 ### Dev slice: the serving stack
 
@@ -102,7 +108,7 @@ Latency is per stage on 2 vCPU, one query at a time. The 150-query rows ran with
 | LoRA, dense-mined hard negatives, minus random negatives | -0.0023 [-0.0056, +0.0010] | -0.0067 [-0.0116, -0.0020] |
 <!-- /table:lora_ablation -->
 
-Mined hard negatives did not beat random in-batch negatives. BM25-mined negatives are behind by a small margin whose nDCG@10 interval excludes zero. Dense-mined negatives are indistinguishable from random on nDCG@10 and significantly behind on hit@10 (-0.0067 [-0.0116, -0.0020]). The shipped adapter uses random negatives. ADR 003 has the setup (rank 16, alpha 32, query and value projections, InfoNCE temperature 0.05, 8,000 pairs from the Natural Questions training split, one epoch). Training loss sat near 0.04 from step 20, so the batches may be too easy for any negative to matter; I did not test that, and a larger run may behave differently. The 100,231 training pairs and their source are described in `docs/data.md`, which also covers the 5 of 3,452 test queries that share their text with a training question.
+Mined hard negatives did not beat random in-batch negatives. BM25-mined negatives are behind by a small margin whose nDCG@10 interval excludes zero. Dense-mined negatives are indistinguishable from random on nDCG@10 and significantly behind on hit@10 (-0.0067 [-0.0116, -0.0020]). The shipped adapter uses random negatives. ADR 003 has the setup (rank 16, alpha 32, query and value projections, InfoNCE temperature 0.05, 8,000 pairs from the Natural Questions training split, one epoch). Training loss sat near 0.04 from step 20, so the batches may be too easy for any negative to matter; that is untested, and a larger run may behave differently. The 100,231 training pairs and their source are described in `docs/data.md`, which also covers the 5 of 3,452 test queries that share their text with a training question.
 
 ### Cited answers and refusal
 
@@ -120,7 +126,7 @@ The agent retrieves, drafts an answer from the passages, and verifies every cite
 
 Both columns use the same 300 questions, BM25 top 5 and the extractive drafter. The gate is far stricter inside the agent than its rates on the label sheet suggest. On the sheet it refused 20.8% of acceptable answers, and in the agent it turns 251 answers into 58. The agent applies the threshold to every claim of an answer, and the sheet scored one cited passage per answer, so I expect an answer with several claims to clear the gate much less often. I read that off `verify()` and did not measure claim counts. The threshold was fitted on 200 answers from this same sampled question set (`make_label_sheet.py` and `agent_smoke.py` share a seed and pool), so the gated column is in-sample for the gate. The jump in citation relevance among answered questions (69.7% to 94.8%) is mostly the effect of answering 193 fewer questions. The injection row is 4 attack sentences times 100 questions, run against an extractive drafter that cannot follow instructions, with detector patterns written for those same sentences. It checks the filtering code path and does not show resistance to a language model being steered.
 
-The gate was thresholded on a sheet of 300 answers (200 from the system, 100 controls) that I labelled by hand, twice, as supported, partial or not supported. My two passes agree 84% of the time (kappa 0.73). One person labelled and that person is also the author, so read the rates as an engineering check. The labels are in `results/labels/answerability_labels.csv` as ids and labels, and `scripts/answerability_gate.py` regenerates the table from them and the dev slice.
+The gate was thresholded on a sheet of 300 answers (200 from the system, 100 controls) that I labelled by hand, twice, as supported, partial or not supported. I recorded 84% agreement between my two passes (kappa 0.73); the first pass is not shipped, so that figure cannot be recomputed here. One person labelled and that person is also the author, so read the rates as an engineering check. The labels are in `results/labels/answerability_labels.csv` as ids and labels, and `scripts/answerability_gate.py` regenerates the table from them and the dev slice.
 
 <!-- table:gate -->
 | Answerability gate, labelled sheet | Value |
@@ -167,7 +173,7 @@ Each has an ADR in `docs/adr/` with the alternatives I considered and the number
 
 ## Run it
 
-Python 3.11 or later. On a machine without a GPU, install the CPU build of torch first, because `sentence-transformers` otherwise pulls the multi-gigabyte CUDA build:
+CI runs the Python tests on 3.11 and 3.13 (ruff checks syntax errors, pyflakes, import order, pycodestyle E4/E7 and bugbear). On a machine without a GPU, install the CPU build of torch first, because `sentence-transformers` otherwise pulls the multi-gigabyte CUDA build:
 
 ```
 python -m venv .venv
@@ -185,7 +191,7 @@ make serve-untuned   # http://localhost:8000, POST /v1/search
 
 `dev-data` is the slow one: the encode step alone takes about 30 minutes on 2 vCPU. It runs `scripts/fetch_nq.py` (the files are byte-identical to the ones my numbers came from), `scripts/make_dev_corpus.py`, `scripts/embed_dev.py` and `scripts/export_reranker.py`, which also writes the INT8 model the service loads. I ran the export and the server from a clean clone with the slice and embeddings in place; the first two steps I ran in an earlier clean-clone check. To serve the adapter behind the tables, train it (`scripts/train_biencoder.py configs/lora_easy.json`, 8,000 pairs, hours on 2 vCPU), run `scripts/embed_dev.py data/dev --tag lora_easy --adapter artifacts/lora_easy`, and start `python -m wikiret.serve` without the overrides. `scripts/make_train_pairs.py` fetches the training pairs and `scripts/run_ablation.sh` trains and evaluates every arm. `scripts/eval_index.py`, `scripts/eval_rerank.py` and `scripts/answerability_gate.py` reproduce the dev-slice tables. The full-corpus table comes from the notebooks in `kaggle/` on a T4 and takes a few hours. Training logs to MLflow when you add the `train` extra.
 
-`make run` builds the Docker image and serves the same data (`docker compose`, http://localhost:8000/healthz); it expects `data/dev` with `emb_lora_easy.npy` and `artifacts/` in place, so it follows the training path above. The service's environment variables are listed at the top of `src/wikiret/serve.py`. `docs/infra-status.md` says which deployment pieces I ran and which I only wrote.
+`python -m wikiret.serve` listens on 127.0.0.1 by default; the Docker image sets `WIKIRET_HOST=0.0.0.0` so the published port works. `make run` builds the Docker image and serves the same data (`docker compose`, http://localhost:8000/healthz); it expects `data/dev` with `emb_lora_easy.npy` and `artifacts/` in place, so it follows the training path above. The service's environment variables are listed at the top of `src/wikiret/serve.py`. `docs/infra-status.md` says which deployment pieces I ran and which I only wrote.
 
 To regenerate or verify the README tables: `python docs/readme_tables.py --write` and `--check`.
 
@@ -194,12 +200,12 @@ To regenerate or verify the README tables: `python docs/readme_tables.py --write
 - **The full-corpus adapter gain is small, 0.014 nDCG@10.** It is clearly above noise in the paired test, but the tuned arm was chosen among three on the test queries, so the p-value ignores that selection.
 - **Refine and rerank are measured on the dev slice only,** and the full-corpus hybrid has no number at all.
 - **The gate over-refuses inside the agent.** It answers 58 of 300 questions (see the agent table), and the threshold was fitted on the same sampled questions.
-- **Service load numbers are synthetic.** They come from a 2 vCPU container, one request at a time, with the load generator sharing the same two CPUs (`results/loadtest.json`). Without the semantic cache, retrieval alone answers at p50 16.5 to 18.4 ms and p95 about 21 to 22 ms (about 54 to 59 requests per second). With the INT8 reranker on the top 20 it answers at p50 871 to 916 ms, p95 about 1,000 ms and p99 1,076 to 1,120 ms (about 1.1 requests per second). With the cache on, a fresh start and 30% generated repeats, p50 was 750 to 824 ms and p99 1.0 to 1.3 s, with 38 to 44 of 100 requests served from the cache. I did not measure concurrency above 1, a real traffic mix or a bigger machine.
+- **Service load numbers are synthetic.** They come from a 2 vCPU container, one request at a time, with the load generator sharing the same two CPUs (`results/loadtest.json`). Without the semantic cache, retrieval alone answers at p50 16.5 to 18.4 ms and p95 about 21 to 22 ms (about 54 to 59 requests per second). With the INT8 reranker on the top 20 it answers at p50 871 to 916 ms, p95 about 1,000 ms and p99 1,076 to 1,120 ms (about 1.1 requests per second). With the cache on, a fresh start and 30% generated repeats, p50 was 750 to 824 ms and p99 1.0 to 1.3 s, with 38 to 44 of 100 requests served from the cache. Nothing was measured above concurrency 1, on a real traffic mix or on a bigger machine.
 - **The Kubernetes manifests have never been applied.** `kind create cluster` fails in my cloud sandbox with a nested-container error, so they have only passed schema validation. Terraform was applied and destroyed against LocalStack only (4 resources). The GitHub Actions jobs (python, go, image build, terraform) were green on the latest push.
 - **Labels come from one person,** who is also the author.
 - **Answers are extractive,** and no LLM drafter has been evaluated.
 - **Inference is CPU-only.** A 20-candidate rerank is about 800 ms on 2 vCPU.
-- **Five test queries have the same text as training questions.** I did not rerun the evaluation without them (see `docs/data.md`).
+- **Five test queries have the same text as training questions.** The evaluation was not rerun without them (see `docs/data.md`).
 
 ## Licence and data
 
