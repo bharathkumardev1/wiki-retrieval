@@ -23,7 +23,7 @@ What was run, what was only written, and where the limits are. Everything below 
 
 ## Not measured
 
-No latency or throughput numbers are reported for the service or the load generator. The container's two CPUs were shared with a long evaluation job while this work ran, so any timing would describe contention, not the service. Run `make loadtest` on an idle machine; its output is labelled as synthetic load.
+Service latency and throughput were measured on an otherwise idle 2 vCPU container with synthetic load, one request at a time; the numbers and their caveats are in the README and in `results/loadtest.json`. Nothing was measured under concurrency, on the kind cluster, or on a larger host.
 
 ## Things that will trip a first run
 

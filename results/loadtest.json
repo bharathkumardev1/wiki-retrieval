@@ -1,0 +1,133 @@
+{
+  "note": "SYNTHETIC LOAD. Generated question templates filled with random topic words; single host; not real traffic. Dev slice (104,201 passages), not the full corpus.",
+  "host": "2 vCPU cloud container, nothing else of mine running, load generator on the same 2 vCPUs (it competes with the server), closed loop, client-side latency including HTTP and JSON",
+  "command": "python scripts/loadtest.py --url ... --requests N --concurrency 1 [--seed S]",
+  "no_cache_rerank_int8_top20": {
+    "requests_per_run": 60,
+    "runs": [
+      {
+        "seed_or_run": 1,
+        "concurrency": 1,
+        "requests_ok": 60,
+        "errors": 0,
+        "throughput_rps": 1.16,
+        "p50": 870.85,
+        "p95": 1001.97,
+        "p99": 1119.94,
+        "max": 1119.94,
+        "cache_hits": 0
+      },
+      {
+        "seed_or_run": 2,
+        "concurrency": 1,
+        "requests_ok": 60,
+        "errors": 0,
+        "throughput_rps": 1.1,
+        "p50": 909.2,
+        "p95": 1008.99,
+        "p99": 1075.95,
+        "max": 1075.95,
+        "cache_hits": 0
+      },
+      {
+        "seed_or_run": 3,
+        "concurrency": 1,
+        "requests_ok": 60,
+        "errors": 0,
+        "throughput_rps": 1.12,
+        "p50": 916.44,
+        "p95": 1004.37,
+        "p99": 1109.17,
+        "max": 1109.17,
+        "cache_hits": 0
+      }
+    ],
+    "server": "WIKIRET_CACHE_THRESHOLD=0, one server, 3 runs"
+  },
+  "no_cache_no_rerank": {
+    "requests_per_run": 300,
+    "runs": [
+      {
+        "seed_or_run": 1,
+        "concurrency": 1,
+        "requests_ok": 300,
+        "errors": 0,
+        "throughput_rps": 55.99,
+        "p50": 17.5,
+        "p95": 21.58,
+        "p99": 24.93,
+        "max": 67.23,
+        "cache_hits": 0
+      },
+      {
+        "seed_or_run": 2,
+        "concurrency": 1,
+        "requests_ok": 300,
+        "errors": 0,
+        "throughput_rps": 58.66,
+        "p50": 16.5,
+        "p95": 20.94,
+        "p99": 24.94,
+        "max": 39.19,
+        "cache_hits": 0
+      },
+      {
+        "seed_or_run": 3,
+        "concurrency": 1,
+        "requests_ok": 300,
+        "errors": 0,
+        "throughput_rps": 54.2,
+        "p50": 18.43,
+        "p95": 22.28,
+        "p99": 25.87,
+        "max": 43.16,
+        "cache_hits": 0
+      }
+    ],
+    "server": "WIKIRET_CACHE_THRESHOLD=0 WIKIRET_RERANKER_DIR= , one server, 3 runs"
+  },
+  "cache_on_rerank_on_cold_start": {
+    "requests_per_run": 100,
+    "repeat_share": 0.3,
+    "runs": [
+      {
+        "seed_or_run": 1,
+        "concurrency": 1,
+        "requests_ok": 100,
+        "errors": 0,
+        "throughput_rps": 2.1,
+        "p50": 757.95,
+        "p95": 910.96,
+        "p99": 1027.62,
+        "max": 1027.62,
+        "cache_hits": 44
+      },
+      {
+        "seed_or_run": 2,
+        "concurrency": 1,
+        "requests_ok": 100,
+        "errors": 0,
+        "throughput_rps": 2.01,
+        "p50": 749.81,
+        "p95": 936.01,
+        "p99": 1134.91,
+        "max": 1134.91,
+        "cache_hits": 41
+      },
+      {
+        "seed_or_run": 3,
+        "concurrency": 1,
+        "requests_ok": 100,
+        "errors": 0,
+        "throughput_rps": 1.79,
+        "p50": 824.43,
+        "p95": 974.24,
+        "p99": 1261.2,
+        "max": 1261.2,
+        "cache_hits": 38
+      }
+    ],
+    "server": "fresh server per run so the cache starts empty, seeds 1 to 3; p50 sits in the cache-miss range because under half of requests hit"
+  },
+  "read_this_way": "An earlier pass reused one server and one seed for three runs, so runs 2 and 3 were all cache hits (p50 about 15 ms). That pass was discarded and is not reported."
+}
