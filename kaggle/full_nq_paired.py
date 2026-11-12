@@ -139,8 +139,10 @@ def save(arrays, meta, final=False):
                                                  for m in ("ndcg@10", "recall@100")}
         res["means"] = {t: {m: round(float(arrays[f"{t}/{m}"].mean()), 4) for m in ("ndcg@10", "hit@10", "recall@10", "recall@100")}
                         for t in ("untuned", "lora_easy")}
-        res["per_query_ndcg@10"] = {"qids": qids, "untuned": [round(float(x), 5) for x in arrays["untuned/ndcg@10"]],
-                                    "lora_easy": [round(float(x), 5) for x in arrays["lora_easy/ndcg@10"]]}
+        # Every metric is stored per query so any paired test can be recomputed from this file alone.
+        res["per_query"] = {"qids": qids,
+                            **{m: {t: [round(float(x), 5) for x in arrays[f"{t}/{m}"]] for t in ("untuned", "lora_easy")}
+                               for m in ("ndcg@10", "hit@10", "recall@10", "recall@100")}}
     (OUT / "full_nq_paired.json").write_text(json.dumps(res, indent=2))
     return res
 

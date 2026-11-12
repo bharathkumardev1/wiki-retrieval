@@ -57,7 +57,7 @@ out = {"n_system_rows": len(rows), "n_not_supported": int(bad.sum()),
        "final_threshold": round(final, 3),
        "final_threshold_in_sample": {k: round(v, 3) for k, v in rates(s, bad, final).items()},
        "model": "cross-encoder/ms-marco-MiniLM-L6-v2, INT8 ONNX, max_len 256",
-       "note": "one annotator, who is also the author; the two labelling passes agreed on 84% of rows (kappa 0.73) and the first pass is not in the repo"}
+       "note": "one annotator, who is also the author. The annotator recorded that the two labelling passes agreed on 84% of rows (kappa 0.73); the first pass is not shipped, so that agreement cannot be recomputed from the repo"}
 Path("configs").mkdir(exist_ok=True)
 Path("configs/answerability.json").write_text(json.dumps({"min_answerability": round(final, 3), "model": out["model"]}, indent=2))
 Path("results/answerability_gate.json").write_text(json.dumps(out, indent=2))
