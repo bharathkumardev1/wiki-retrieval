@@ -1,0 +1,87 @@
+[
+  {
+    "question": "striking the funny bone is actually compression of the",
+    "answer": "The retrieved passages do not support an answer.",
+    "refused": true,
+    "cited": [],
+    "gold_cited": false,
+    "attempts": 2,
+    "seconds": 55.6,
+    "verify_rejections": [
+      [
+        "no citation"
+      ],
+      [
+        "no citation"
+      ]
+    ]
+  },
+  {
+    "question": "which state does not fall under the direction of guwahati high court",
+    "answer": "The retrieved passages do not support an answer.",
+    "refused": true,
+    "cited": [],
+    "gold_cited": false,
+    "attempts": 2,
+    "seconds": 49.4,
+    "verify_rejections": [
+      [
+        "empty draft"
+      ],
+      [
+        "empty draft"
+      ]
+    ]
+  },
+  {
+    "question": "what dna changes produce the delta f508 mutation",
+    "answer": "The retrieved passages do not support an answer.",
+    "refused": true,
+    "cited": [],
+    "gold_cited": false,
+    "attempts": 2,
+    "seconds": 49.8,
+    "verify_rejections": [
+      [
+        "empty draft"
+      ],
+      [
+        "empty draft"
+      ]
+    ]
+  },
+  {
+    "question": "who wrote when a man loves a woman",
+    "answer": "The retrieved passages do not support an answer.",
+    "refused": true,
+    "cited": [],
+    "gold_cited": false,
+    "attempts": 2,
+    "seconds": 58.3,
+    "verify_rejections": [
+      [
+        "empty draft"
+      ],
+      [
+        "no citation"
+      ]
+    ]
+  },
+  {
+    "question": "what is the speed of the nascar pace car",
+    "answer": "The retrieved passages do not support an answer.",
+    "refused": true,
+    "cited": [],
+    "gold_cited": false,
+    "attempts": 2,
+    "seconds": 84.1,
+    "verify_rejections": [
+      [
+        "not supported by the cited passage"
+      ],
+      [
+        "not supported by the cited passage"
+      ]
+    ]
+  }
+]

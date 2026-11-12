@@ -32,8 +32,10 @@ retriever would return the same passages.
   passage was labelled relevant in 69.7%. The other 30.3% cite a passage that the NQ labels do not mark relevant; some
   of those may still answer the question (the labels are incomplete), which is what the human sheet is for.
 - Evidence taken from a different, random question: answered 2 of 300 (0.7%).
-- Planted instructions in the top passage (4 attack sentences x 100 questions = 400 trials): 0 answers changed, 0
-  answer/refusal flips, 0 answers containing attack text. An earlier run changed 4 answers: a passage ending in the
+- Planted instructions in the top passage (4 attack sentences x 100 questions = 400 trials, run against an extractive
+  generator that cannot follow instructions, with detector patterns written for those four sentences): 0 answers changed, 0
+  answer/refusal flips, 0 answers containing attack text. The trials exercise the filtering code and do not show how a
+  language model would behave. An earlier run changed 4 answers: a passage ending in the
   wiki tag "[citation needed]" glued the attack onto the last real sentence and the whole thing was quarantined. Fixed by
   removing such tags before splitting; there is a test for it.
 - Support check versus the lexical relevance score, on the 200 'system' rows of the label sheet: the relevance score
@@ -55,14 +57,26 @@ retriever would return the same passages.
 
 ## Validation
 The thresholds (0.7, 0.5) were set up front and were not tuned. Scored against the 300-row labelled sheet (results/judge_agreement_lexical.json),
-the lexical judge agreed with the labels at chance on the 200 system answers (kappa -0.006, interval -0.032 to 0.018): it called 194 of 200 supported.
+the lexical judge agreed with the labels at chance on the 200 system answers (kappa -0.006, interval -0.032 to 0.018): it called 194 of 200 supported, so a kappa near zero is what a near-constant predictor gives. The two judges were also
+tuned differently: these thresholds were fixed up front and left alone, while ADR 008 fits its cutoff on the labels
+with cross-fitting.
 ADR 008 replaces it with a cross-encoder answerability gate and reports its out-of-sample agreement.
 
-The optional answerability hook takes any function of (question, passage). ADR 008 plugs the ONNX cross-encoder from
-the search service into it and calibrates the threshold on the same labels.
+The answerability hook takes any function of (question, passage). ADR 008 plugs the ONNX cross-encoder from the search
+service into it and calibrates the threshold on the same labels. `agent_demo.py` and `agent_smoke.py` turn it on whenever
+`configs/answerability.json` and `artifacts/reranker_int8` exist (`wikiret.agent.default_verify_config`), and
+`--no-gate` runs the lexical verifier alone.
+
+With the gate on, the same 300-question smoke test (results/agent_smoke_gated.json) answers 58 questions and refuses 242,
+and 94.8% of the answered ones cite a labelled-relevant passage (69.7% with the lexical verifier alone, which answers
+251). Evidence from a different question gets answered 0 times. The smoke questions overlap the 200 system questions the
+threshold was fitted on, so this run is in-sample for the gate. The refusal rate is much higher than the label sheet's
+20.8% false-refusal rate because `verify()` requires every claim of an answer to clear the threshold and the sheet scored
+one cited passage per answer; I did not count claims per answer to confirm that.
 
 ## Generators
 - ExtractiveGenerator: deterministic, tested, used for every number above.
-- TransformersGenerator (Qwen2.5-0.5B-Instruct on CPU): runs, but in an 8-question trial it produced no answer that
-  passed the gate (empty drafts or missing citations), at 37 to 65 seconds per question on a loaded 2 vCPU host. That is
-  too few questions to estimate a rate, but enough to rule this model size out as a useful drafter here.
+- TransformersGenerator (Qwen2.5-0.5B-Instruct on CPU): runs. In a 5-question trial with the lexical verifier
+  (results/agent_demo_qwen.json) every answer was refused after two attempts (empty draft, no citation, or not supported
+  by the cited passage), at 49 to 84 seconds per question on a 2 vCPU host. Five questions are too few to estimate a rate,
+  so I draw no conclusion about the model size beyond "this one did not produce a verifiable answer on these five".
