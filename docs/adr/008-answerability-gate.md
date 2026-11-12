@@ -3,7 +3,7 @@
 Status: accepted, with modest validated accuracy
 
 ## Context
-ADR 006 describes a lexical verifier. Scored against a labelled sheet it did not work on system answers: on 200 system-answer rows its agreement with the labels was at chance (kappa -0.006, interval -0.032 to 0.018). It called 194 of 200 answers supported, while the labels mark 76 of them not supported and about 76 partial.
+ADR 006 describes a lexical verifier. Scored against a labelled sheet it did not work on system answers: on 200 system-answer rows its agreement with the labels was at chance (kappa -0.006, interval -0.032 to 0.018). It called 194 of 200 answers supported, while the labels mark 48 supported, 76 partial and 76 not supported.
 
 ## Labels
 300 rows (200 system answers, 100 control rows pairing a question with a passage from an unrelated question), labelled by the project owner against docs/label_rubric.md as supported, partial or not supported. The owner labelled every row in two passes; the two passes agree on 84% of rows (kappa 0.73). There is one annotator, and that person is also the builder, so this validates the gate against one person's reading, not against independent raters. The sheet contains passage text and is kept outside the repository.
@@ -14,7 +14,7 @@ The ONNX cross-encoder scores (question, passage) and (question, answer sentence
 | Score | AUC supported vs rest | AUC not supported vs rest | 3-class kappa (out of sample) |
 |---|---|---|---|
 | lexical judge | n/a | n/a | -0.006 |
-| question + answer sentence | n/a | n/a | lower than the passage score |
+| question + answer sentence | 0.678 | 0.743 | 0.245 [0.143, 0.348] |
 | question + passage | 0.762 | 0.873 | 0.355 [0.251, 0.458] |
 
 ## Decision
