@@ -43,26 +43,26 @@ retriever would return the same passages.
 ## Known failure modes
 - The check is lexical. It does not detect negation ("was not completed in 1889"), swapped entities that share
   words, or a paraphrase that shares few stems with its source. The last one makes the gate refuse correct answers from a
-  model that rewrites instead of quotes.
+  model that paraphrases where it could quote.
 - The answer-type check is shallow: any number satisfies it, so a year can satisfy 'how long'. Only when- and
   how-many-type questions are covered; 'who' and 'where' are not.
 - The extractive generator copies sentences, so claim support is nearly always 1.0. That makes the support test uninformative
   for it; the work is done by the relevance and answer-type checks, and those are the weak ones (see above).
 - Instruction detection is pattern-based. A paraphrased instruction that matches none of the patterns is treated as an
   ordinary sentence. It still cannot reach the output unless it is also a verified, relevant claim.
-- A false statement written as a normal sentence in a retrieved passage is not detected. The gate checks support, not truth.
+- A false statement written as a normal sentence in a retrieved passage is not detected. The check measures lexical support and cannot tell a true claim from a false one.
 - Sentence splitting is a regular expression and mis-splits some abbreviations.
 
-## What is and is not validated
+## Validation
 The thresholds (0.7, 0.5) were set up front and were not tuned. Scored against the 300-row labelled sheet (results/judge_agreement_lexical.json),
 the lexical judge agreed with the labels at chance on the 200 system answers (kappa -0.006, interval -0.032 to 0.018): it called 194 of 200 supported.
 ADR 008 replaces it with a cross-encoder answerability gate and reports its out-of-sample agreement.
 
-The optional answerability hook takes any function of (question, passage). The intended use is the ONNX cross-encoder
-from the search service. It has not been run here, and its threshold has to be calibrated on the same labels.
+The optional answerability hook takes any function of (question, passage). ADR 008 plugs the ONNX cross-encoder from
+the search service into it and calibrates the threshold on the same labels.
 
 ## Generators
 - ExtractiveGenerator: deterministic, tested, used for every number above.
 - TransformersGenerator (Qwen2.5-0.5B-Instruct on CPU): runs, but in an 8-question trial it produced no answer that
   passed the gate (empty drafts or missing citations), at 37 to 65 seconds per question on a loaded 2 vCPU host. That is
-  too few questions to estimate a rate, and it shows this model size is not a useful drafter here.
+  too few questions to estimate a rate, but enough to rule this model size out as a useful drafter here.

@@ -18,10 +18,11 @@ The compressed index returns `n_candidates` passages and the dense ordering is r
 Brute-force exact search on the same host takes 12.3 ms p50 (numpy matmul, one query).
 
 ## Decision
-Default to nprobe 256 and 1000 candidates. At that point the paired nDCG@10 loss against exact hybrid search is 0.0025 [0.0007, 0.0044]: small, but the interval excludes zero, so I report it as a loss. Without the refine step the same index loses 0.0185 [0.0139, 0.0232] (hybrid), so the refine step recovers most of the damage. The operating point was chosen by overlap with exact search, not by relevance labels, to avoid tuning on the evaluation judgments.
+Default to nprobe 256 and 1000 candidates. At that point the paired nDCG@10 loss against exact hybrid search is 0.0025 [0.0007, 0.0044]: small, but the interval excludes zero, so I report it as a loss. Without the refine step the same index loses 0.0185 [0.0139, 0.0232] (hybrid), so the refine step recovers most of the damage. I picked the operating point by overlap with exact search, which avoids tuning on the evaluation judgments.
 
-## Limits
-- The 10x dense-stage speedup is measured at 104k passages. At 2.68M passages the exact scan is about 26 times larger, so the gap should widen, but I have not measured it there.
-- Refine needs the float vectors in memory (4.1 GB for the full corpus in float32, 2.1 GB in float16), so the compression speeds up search and does not shrink the process.
-- nprobe 256 of 1024 lists is a quarter of the index; at 4096 lists on the full corpus the right setting will differ.
-- Run on a 2 vCPU container, one query at a time.
+## Caveats
+The speedup is measured at 104k passages on a 2 vCPU container, one query at a time. At 2.68M passages the exact scan is about 26 times larger, so the gap should widen, but I have not measured it there. Neither have I measured this configuration's quality or latency on the full corpus. The full-corpus IVF-PQ numbers in the README (2.6 to 4.6 ms) are the unrefined index at nprobe 64.
+
+Refine needs the float vectors in memory (4.1 GB for the full corpus in float32, 2.1 GB in float16). The compressed codes make the scan faster, and the process still holds the full matrix. Any index-size claim applies to the codes alone.
+
+nprobe 256 of 1024 lists is a quarter of the index. At 4096 lists on the full corpus the right setting will differ.

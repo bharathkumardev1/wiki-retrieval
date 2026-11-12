@@ -3,7 +3,7 @@
 Status: accepted, with a negative result
 
 ## Context
-I trained the encoder with LoRA (r=16, alpha=32, query and value projections, in-batch InfoNCE, temperature 0.05) on 8,000 NQ question/passage pairs, one epoch. Three arms: in-batch negatives only, one BM25-mined hard negative (ranks 100 to 500), one dense-mined hard negative. All evaluated on the 104,201 passage dev slice with paired bootstrap confidence intervals.
+I trained the encoder with LoRA (r=16, alpha=32, query and value projections, in-batch InfoNCE, temperature 0.05) on 8,000 NQ question/passage pairs, one epoch. The arms differ only in negatives: in-batch only, plus one BM25-mined hard negative (ranks 100 to 500) per query, or plus one dense-mined hard negative. All evaluated on the 104,201 passage dev slice with paired bootstrap confidence intervals.
 
 ## Results (dense nDCG@10, dev slice)
 | Arm | nDCG@10 | Paired diff vs untuned (95% CI) |
@@ -16,7 +16,7 @@ I trained the encoder with LoRA (r=16, alpha=32, query and value projections, in
 Hard against easy: -0.0035 [-0.0066, -0.0005] for BM25-mined, -0.0023 [-0.0056, +0.0010] for dense-mined. Hybrid (RRF with BM25) scores 0.7856, 0.7859, 0.7823 for the three arms.
 
 ## Decision
-Keep LoRA. Do not claim hard negatives help. At this scale they did not: the BM25-mined arm is slightly worse and the dense-mined arm is indistinguishable from easy.
+Keep LoRA with in-batch negatives. At this scale the BM25-mined arm is slightly worse and the dense-mined arm is indistinguishable from easy, so I make no claim that hard negatives help. The training pairs come from `docs/data.md`.
 
-## What I do not know
-Training loss was near 0.04 from step 20, so batches may simply be too easy for the signal to matter. I have not tested that. 8,000 pairs, one epoch and one negative per query is a small setup, and the result may not hold at larger scale. No correction for multiple comparisons was applied.
+## Open question
+Training loss sat near 0.04 from step 20, so the batches may be too easy for any negative to matter. I did not test that. The setup is small (8,000 pairs, one epoch, one negative per query) and the result could change with more data. I also did not correct for the three comparisons.

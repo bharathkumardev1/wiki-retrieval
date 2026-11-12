@@ -8,5 +8,4 @@ sentence-transformers/all-MiniLM-L6-v2 scores 0.835 dense nDCG@10 on the dev sli
 ## Decision
 Use sentence-transformers/msmarco-MiniLM-L6-cos-v5 as the base. Its card does not list NQ. I read the card only; I did not audit the training data.
 
-## Consequences
-The untuned dense baseline is lower (0.7286 on the slice) and the fine-tuning gain is measured against a model that has not seen the test task. If the card is wrong, the claim breaks, so the README says what was and was not checked.
+The untuned dense baseline is lower (0.7286 on the slice), and the fine-tuning gain is measured against a model that, going by its card, has not seen the test task. If the card is wrong the clean-baseline claim fails, which is why the README says the card was all I checked.
