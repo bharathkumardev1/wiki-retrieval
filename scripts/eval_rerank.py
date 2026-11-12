@@ -22,6 +22,7 @@ ap.add_argument("--tag", default="lora_easy")
 ap.add_argument("--depth", type=int, default=30)
 ap.add_argument("--limit", type=int, default=0)
 ap.add_argument("--reranker", type=Path, default=Path("artifacts/reranker"))
+ap.add_argument("--out", type=Path, default=None, help="write the report here (default results/dev_rerank_<tag>.json for full runs)")
 a = ap.parse_args()
 
 t = pq.read_table(a.dev / "corpus.parquet")
@@ -70,6 +71,8 @@ report = {"note": "REDUCED CORPUS; not comparable to full-corpus numbers", "n_qu
           "rerank_ms_per_query": {"p50": round(float(np.percentile(lat, 50))), "p95": round(float(np.percentile(lat, 95))),
                                   "p99": round(float(np.percentile(lat, 99)))},
           "host": "2 vCPU container, one query at a time, ONNX Runtime CPU"}
-if not a.limit:
+if a.out:
+    a.out.write_text(json.dumps(report, indent=2))
+elif not a.limit:
     Path(f"results/dev_rerank_{a.tag}.json").write_text(json.dumps(report, indent=2))
 print(json.dumps(report, indent=1))
