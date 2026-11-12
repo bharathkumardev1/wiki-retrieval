@@ -29,7 +29,8 @@ RUN useradd --create-home --uid 10001 app
 COPY --from=build /opt/venv /opt/venv
 COPY --from=build /opt/hf /opt/hf
 ENV PATH=/opt/venv/bin:$PATH HF_HOME=/opt/hf HF_HUB_OFFLINE=1 PYTHONUNBUFFERED=1 \
-    WIKIRET_DATA_DIR=/data WIKIRET_ADAPTER=/artifacts/lora_easy WIKIRET_RERANKER_DIR=/artifacts/reranker_int8
+    WIKIRET_DATA_DIR=/data WIKIRET_ADAPTER=/artifacts/lora_easy WIKIRET_RERANKER_DIR=/artifacts/reranker_int8 \
+    WIKIRET_HOST=0.0.0.0
 USER app
 EXPOSE 8000
 # The corpus, embeddings and model artifacts are mounted, not baked in: they are large and not redistributable.

@@ -11,7 +11,7 @@ docker compose, kind and a laptop shell without edits:
   WIKIRET_RERANK_DEPTH  how many fused candidates the cross-encoder re-scores  (default 20)
   WIKIRET_NLIST, WIKIRET_PQ_BYTES, WIKIRET_NPROBE, WIKIRET_CANDIDATES      index settings
   WIKIRET_CACHE_THRESHOLD   semantic cache cosine threshold; 0 disables the cache
-  WIKIRET_HOST, WIKIRET_PORT
+  WIKIRET_HOST, WIKIRET_PORT   (host defaults to 127.0.0.1; the Docker image and compose file set 0.0.0.0)
 """
 from __future__ import annotations
 
@@ -44,7 +44,7 @@ class Config:
     nprobe: int = 256
     n_candidates: int = 1000
     cache_threshold: float = 0.97
-    host: str = "0.0.0.0"
+    host: str = "127.0.0.1"
     port: int = 8000
 
     @classmethod
