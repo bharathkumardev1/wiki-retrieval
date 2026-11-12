@@ -1,0 +1,70 @@
+{
+  "note": "REDUCED DEV CORPUS; not comparable to full-corpus numbers. First 500 queries with relevance labels, depth 20, models re-exported by scripts/export_reranker.py in this run.",
+  "command": "python scripts/eval_rerank.py data/nq data/dev --limit 500 --depth 20 --reranker <dir> --out <file>",
+  "export_report": {
+    "model": "cross-encoder/ms-marco-MiniLM-L6-v2",
+    "max_len": 256,
+    "max_abs_logit_diff": 2.86102294921875e-06,
+    "n_pairs": 12,
+    "rank_order_identical": true,
+    "int8_max_abs_logit_diff": 0.42624711990356445
+  },
+  "ndcg@10_500_queries": {
+    "hybrid": {
+      "mean": 0.7639,
+      "ci95": [
+        0.7347,
+        0.792
+      ]
+    },
+    "fp32_rerank_top20": {
+      "mean": 0.861,
+      "ci95": [
+        0.8358,
+        0.884
+      ]
+    },
+    "int8_rerank_top20": {
+      "mean": 0.8597,
+      "ci95": [
+        0.8343,
+        0.8828
+      ]
+    }
+  },
+  "rerank_gain_over_hybrid_top20": {
+    "fp32": {
+      "mean": 0.0971,
+      "ci95": [
+        0.0763,
+        0.1192
+      ]
+    },
+    "int8": {
+      "mean": 0.0958,
+      "ci95": [
+        0.0752,
+        0.1175
+      ]
+    }
+  },
+  "rerank_ms_per_query": {
+    "int8_500_queries": {
+      "p50": 813,
+      "p95": 915,
+      "p99": 948
+    },
+    "fp32_150_queries_quiet_rerun": {
+      "p50": 1123,
+      "p95": 1272,
+      "p99": 1351
+    },
+    "fp32_500_queries_noisy_host_do_not_use": {
+      "p50": 2293,
+      "p95": 2703,
+      "p99": 2906
+    }
+  },
+  "latency_note": "The 500-query fp32 pass ran at p50 2293 ms; a rerun on 150 queries with nothing else running gave 1123 ms, matching the earlier 1103 ms in dev_rerank_latency.json. The slow pass is a noisy host, not the model, so it is kept here only for transparency.",
+  "host": "2 vCPU container, one query at a time, ONNX Runtime CPU"
+}
