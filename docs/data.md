@@ -6,7 +6,7 @@ reproducibility check a hash.
 | What | Where it comes from | Fetched by | Licence |
 |---|---|---|---|
 | BEIR NQ corpus, queries, test qrels (2,681,468 passages, 3,452 judged queries) | `BeIR/nq` and `BeIR/nq-qrels` on the Hugging Face Hub | `scripts/fetch_nq.py` | The cards disagree (cc-by-sa-4.0 on one, cc-by-nc-sa-3.0 on the other). I treat it as non-commercial. |
-| Training pairs (100,231 question and answer-passage rows) | `pair` subset of `sentence-transformers/natural-questions` on the Hub, built from the Natural Questions training split | `scripts/make_train_pairs.py` | The dataset card declares none. The Natural Questions card on the Hub declares cc-by-sa-3.0, which I use as the working assumption. |
+| Training pairs (100,231 question and answer-passage rows) | `pair` subset of `sentence-transformers/natural-questions` on the Hub, built from the Natural Questions training split | `scripts/make_train_pairs.py` | Derived from Natural Questions, which Google publishes under CC BY-SA 3.0 Unported (card: `google-research-datasets/natural_questions`). The `sentence-transformers` repackaging declares no licence of its own, so the source terms apply: attribution and share-alike. |
 | Simple English Wikipedia dump | dumps.wikimedia.org | `ingest/` (Go) | GFDL and CC BY-SA 4.0 |
 
 I confirmed that `data/train/nq_pairs.parquet`, the file every adapter in `results/` was trained on, is
