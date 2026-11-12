@@ -1,6 +1,17 @@
 PYTHON_IMAGE ?= python:3.13-slim
 
-.PHONY: run test lint image kind-up kind-load kind-deploy kind-down loadtest localstack tf-apply tf-destroy
+.PHONY: dev-data serve-untuned run test lint image kind-up kind-load kind-deploy kind-down loadtest localstack tf-apply tf-destroy
+
+# Everything `python -m wikiret.serve` needs on a fresh clone, with the untuned encoder (no training).
+# Downloads about 765 MB, then encodes 104,201 passages (about 30 minutes on 2 vCPU).
+dev-data:
+	.venv/bin/python scripts/fetch_nq.py data/nq
+	.venv/bin/python scripts/make_dev_corpus.py data/nq data/dev
+	.venv/bin/python scripts/embed_dev.py data/dev --tag untuned
+	.venv/bin/python scripts/export_reranker.py artifacts/reranker
+
+serve-untuned:
+	WIKIRET_TAG=untuned WIKIRET_ADAPTER= .venv/bin/python -m wikiret.serve
 
 run:
 	PYTHON_IMAGE=$(PYTHON_IMAGE) docker compose up --build

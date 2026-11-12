@@ -25,6 +25,7 @@ def test_env_overrides_and_empty_values_disable_features():
                          "WIKIRET_NPROBE": "32", "WIKIRET_CACHE_THRESHOLD": "0"})
     assert (c.port, c.adapter, c.reranker_dir, c.nprobe, c.cache_threshold) == (9001, None, None, 32, 0.0)
     assert Config.from_env({}).nprobe == 256  # documented default
+    assert Config.from_env({}).rerank_depth == 20 and Config.from_env({"WIKIRET_RERANK_DEPTH": "10"}).rerank_depth == 10
 
 
 def test_missing_data_names_the_missing_file(tmp_path):

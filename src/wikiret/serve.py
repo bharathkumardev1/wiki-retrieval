@@ -8,6 +8,7 @@ docker compose, kind and a laptop shell without edits:
   WIKIRET_BASE_MODEL    query encoder base model
   WIKIRET_ADAPTER       LoRA adapter folder merged into the encoder; empty means untuned
   WIKIRET_RERANKER_DIR  ONNX cross-encoder folder; empty disables reranking
+  WIKIRET_RERANK_DEPTH  how many fused candidates the cross-encoder re-scores  (default 20)
   WIKIRET_NLIST, WIKIRET_PQ_BYTES, WIKIRET_NPROBE, WIKIRET_CANDIDATES      index settings
   WIKIRET_CACHE_THRESHOLD   semantic cache cosine threshold; 0 disables the cache
   WIKIRET_HOST, WIKIRET_PORT
@@ -37,6 +38,7 @@ class Config:
     base_model: str = BASE_MODEL
     adapter: Path | None = Path("artifacts/lora_easy")
     reranker_dir: Path | None = Path("artifacts/reranker_int8")
+    rerank_depth: int = 20
     nlist: int = 1024
     pq_bytes: int = 48
     nprobe: int = 256
@@ -62,6 +64,7 @@ class Config:
             base_model=e.get("WIKIRET_BASE_MODEL", d.base_model),
             adapter=path("WIKIRET_ADAPTER", d.adapter),
             reranker_dir=path("WIKIRET_RERANKER_DIR", d.reranker_dir),
+            rerank_depth=int(e.get("WIKIRET_RERANK_DEPTH", d.rerank_depth)),
             nlist=int(e.get("WIKIRET_NLIST", d.nlist)),
             pq_bytes=int(e.get("WIKIRET_PQ_BYTES", d.pq_bytes)),
             nprobe=int(e.get("WIKIRET_NPROBE", d.nprobe)),
@@ -77,7 +80,7 @@ def load_index(cfg: Config) -> HybridIndex:
     vectors = cfg.data_dir / f"emb_{cfg.tag}.npy"
     for p in (corpus, vectors):
         if not p.exists():
-            raise FileNotFoundError(f"{p} not found; see README for how to build the dev corpus and embeddings")
+            raise FileNotFoundError(f"{p} not found; README section \"Run it\" lists the commands that build it (make dev-data)")
     t = pq.read_table(corpus, columns=["_id", "title", "text"])
     emb = np.load(vectors).astype(np.float32)
     return HybridIndex(
@@ -114,7 +117,7 @@ def build_app(cfg: Config, *, encode: Callable | None = None, rerank: Callable |
 
         rerank = OnnxReranker(cfg.reranker_dir)
     cache = SemanticCache(threshold=cfg.cache_threshold) if cfg.cache_threshold > 0 else None
-    return create_app(index, encode, cache=cache, rerank=rerank, rerank_depth=20)
+    return create_app(index, encode, cache=cache, rerank=rerank, rerank_depth=cfg.rerank_depth)
 
 
 def main() -> None:
