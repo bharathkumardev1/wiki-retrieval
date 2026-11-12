@@ -1,0 +1,4 @@
+{
+  "min_answerability": 4.786,
+  "model": "cross-encoder/ms-marco-MiniLM-L6-v2, INT8 ONNX, max_len 256"
+}

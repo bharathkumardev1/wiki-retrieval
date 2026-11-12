@@ -1,0 +1,21 @@
+{
+  "n_system_rows": 200,
+  "n_not_supported": 76,
+  "crossfit_mean_and_sd_over_40_splits": {
+    "refused_of_not_supported": [
+      0.753,
+      0.095
+    ],
+    "refused_of_supported_or_partial": [
+      0.208,
+      0.073
+    ]
+  },
+  "final_threshold": 4.786,
+  "final_threshold_in_sample": {
+    "refused_of_not_supported": 0.816,
+    "refused_of_supported_or_partial": 0.202
+  },
+  "model": "cross-encoder/ms-marco-MiniLM-L6-v2, INT8 ONNX, max_len 256",
+  "note": "labels supplied by the project owner, two passes (agreement 84%, kappa 0.73); single annotator"
+}
