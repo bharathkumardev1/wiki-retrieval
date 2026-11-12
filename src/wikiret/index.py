@@ -5,8 +5,8 @@ Why the refine step: product quantization compresses a 384-d float32 vector to
 48 or 96 bytes, and the ranking noise that causes costs real nDCG (measured on the
 full corpus, results/gpu_full_nq_faiss_lora_easy_t4.json). The compressed index is
 only used to find candidates; the final dense ordering uses exact inner products.
-That requires keeping the float vectors in memory (or memory-mapped), so the
-compression speeds up candidate search and leaves the process the same size."""
+That requires keeping the float vectors in memory (or memory-mapped), so a served
+process is as large as it would be with no compression at all."""
 from __future__ import annotations
 
 import hashlib
