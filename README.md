@@ -173,7 +173,7 @@ Each has an ADR in `docs/adr/` with the alternatives I considered and the number
 
 ## Reproducing the tables and serving it
 
-The workflow in `.github/workflows/ci.yml` runs the Python tests on 3.11 and 3.13, but I have only seen the earlier 3.13-only version run on GitHub; the matrix has not run yet (ruff checks syntax errors, pyflakes, import order, pycodestyle E4/E7 and bugbear). On a machine without a GPU, install the CPU build of torch first, because `sentence-transformers` otherwise pulls the multi-gigabyte CUDA build:
+The workflow in `.github/workflows/ci.yml` runs the Python tests on 3.11 and 3.13, and GitHub Actions run #5, on the push of commit b349589, showed python 3.11, python 3.13, go, image and terraform all green (ruff checks syntax errors, pyflakes, import order, pycodestyle E4/E7 and bugbear). On a machine without a GPU, install the CPU build of torch first, because `sentence-transformers` otherwise pulls the multi-gigabyte CUDA build:
 
 ```
 python -m venv .venv
@@ -201,7 +201,7 @@ To regenerate or verify the README tables: `python docs/readme_tables.py --write
 - **Refine and rerank are measured on the dev slice only,** and the full-corpus hybrid has no number at all.
 - **The gate over-refuses inside the agent.** It answers 58 of 300 questions (see the agent table in "Cited answers and refusal").
 - **Service load numbers are synthetic.** They come from a 2 vCPU container, one request at a time, with the load generator sharing the same two CPUs (`results/loadtest.json`). Without the semantic cache, retrieval alone answers at p50 16.5 to 18.4 ms and p95 about 21 to 22 ms (about 54 to 59 requests per second). With the INT8 reranker on the top 20 it answers at p50 871 to 916 ms, p95 about 1,000 ms and p99 1,076 to 1,120 ms (about 1.1 requests per second). With the cache on, a fresh start and 30% generated repeats, p50 was 750 to 824 ms and p99 1.0 to 1.3 s, with 38 to 44 of 100 requests served from the cache. Nothing was measured above concurrency 1, on a real traffic mix or on a bigger machine.
-- **The Kubernetes manifests have never been applied.** `kind create cluster` fails in my cloud sandbox with a nested-container error, so they have only passed schema validation. Terraform was applied and destroyed against LocalStack only (4 resources). The GitHub Actions jobs (python on 3.13 only, go, image build, terraform) passed on the push before the 3.11/3.13 matrix was added; the matrix itself has not run.
+- **The Kubernetes manifests have never been applied.** `kind create cluster` fails in my cloud sandbox with a nested-container error, so they have only passed schema validation. Terraform was applied and destroyed against LocalStack only (4 resources). The GitHub Actions jobs (python on 3.11 and 3.13, go, image build, terraform) were green in run #5 on the push of commit b349589. Later commits have not been checked.
 - **Labels come from one person,** who is also the author.
 - **Answers are extractive,** and no LLM drafter has been evaluated.
 - **Inference is CPU-only.** A 20-candidate rerank is about 800 ms on 2 vCPU.

@@ -12,7 +12,7 @@ What was run, what was only written, and where the limits are. Everything below 
 | Terraform | `fmt`, `init`, `validate`, then `plan` and `apply` against LocalStack 3.8 (S3 and IAM only), a check of bucket versioning through the S3 API, a second plan, then `destroy` | 4 resources created, versioning reported `Enabled`, the second plan showed no changes, destroy removed all 4 |
 | Kubernetes manifests | Schema validation against Kubernetes 1.31 with `kubernetes-validate --strict`, plus a deliberately broken manifest to confirm the check can fail | Both objects pass, the broken one is rejected |
 | Load generator | Unit tests, including a run against an in-process app that counts cache hits | Pass. Timed numbers from a run against the real service are in `results/loadtest.json` |
-| GitHub Actions | `.github/workflows/ci.yml` on push, with python, go, image build and terraform jobs. Each step's command had been run locally first (`go vet`, `go test`, `terraform fmt`, `init -backend=false`, `validate`, `pytest`, `docker build`) | All four jobs passed on a push of the 3.13-only workflow. The 3.11/3.13 matrix added later has not run on GitHub |
+| GitHub Actions | `.github/workflows/ci.yml` on push, with python, go, image build and terraform jobs. Each step's command had been run locally first (`go vet`, `go test`, `terraform fmt`, `init -backend=false`, `validate`, `pytest`, `docker build`) | Run #5, on the push of commit b349589, showed python 3.11, python 3.13, go, image and terraform all green. Later commits have not been checked |
 | Go and Python tests | `go vet`, `go test`, `pytest` | Pass |
 
 ## Written but not run
