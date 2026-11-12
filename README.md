@@ -139,11 +139,13 @@ Each has an ADR in `docs/adr/` with the alternatives I considered and the number
 The retrieval data is not in the repo. Python 3.11 or later:
 
 ```
-pip install -e '.[serve,dev]'
+pip install -e '.[serve,agent,dev]'
 pytest -q                      # 79 tests, no data needed
 ```
 
 `python scripts/fetch_nq.py data/nq` downloads BEIR NQ (about 765 MB) from the Hugging Face Hub as corpus.parquet, queries.parquet and qrels_test.tsv; I checked that its output is byte-identical to the files my numbers came from. Then `python scripts/make_dev_corpus.py data/nq data/dev` builds the slice, `scripts/run_ablation.sh` trains and evaluates the adapters, and `scripts/eval_index.py`, `scripts/eval_rerank.py` and `scripts/answerability_gate.py` reproduce the tables above. Full-corpus rows come from the notebooks in `kaggle/` on a T4 and take a few hours.
+
+Training logs to MLflow: add the `train` extra (`pip install -e '.[train]'`).
 
 To serve, with `data/dev` and `artifacts/` built:
 
