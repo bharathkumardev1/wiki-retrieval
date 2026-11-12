@@ -63,8 +63,11 @@ for q, v in zip(qtext, Q):
     cand = cand[0][cand[0] >= 0]
     raw = cand[:100]
     ref = cand[np.argsort(-(idx.emb[cand] @ v), kind="stable")][:100]
-    rank["dense_exact"].append(exact); rank["ivfpq_raw"].append(raw); rank["ivfpq_refine"].append(ref)
-    rank["hybrid_exact"].append(rrf([exact, bm])); rank["hybrid_raw"].append(rrf([raw, bm]))
+    rank["dense_exact"].append(exact)
+    rank["ivfpq_raw"].append(raw)
+    rank["ivfpq_refine"].append(ref)
+    rank["hybrid_exact"].append(rrf([exact, bm]))
+    rank["hybrid_raw"].append(rrf([raw, bm]))
     res = idx.search(q, v)
     rank["hybrid_refine"].append(res.order)
     for k in lat:

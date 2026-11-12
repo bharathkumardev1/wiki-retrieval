@@ -70,7 +70,7 @@ for name, score in (("ce_query_answer", s_ans), ("ce_query_passage", s_pas), ("c
     h, p = y[idx], pred[idx]
     res["crossfit_system_percent_agreement"] = round(float((h == p).mean()), 3)
     res["crossfit_system_kappa_3class"] = round(kappa(list(h), list(p), LAB), 3)
-    res["crossfit_system_kappa_3class_ci95"] = boot(lambda ix: kappa(list(h[ix]), list(p[ix]), LAB), len(h))
+    res["crossfit_system_kappa_3class_ci95"] = boot(lambda ix, h=h, p=p: kappa(list(h[ix]), list(p[ix]), LAB), len(h))
     res["crossfit_system_kappa_linear_weighted"] = round(kappa(list(h), list(p), LAB, weights="linear"), 3)
     res["confusion_rows_human_cols_judge"] = [[int(((h == a) & (p == b)).sum()) for b in LAB] for a in LAB]
     out[name] = res

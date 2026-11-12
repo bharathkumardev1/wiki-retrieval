@@ -37,6 +37,7 @@ p_tr = [answers[i] for i in pick]
 neg_tr = None
 if cfg["hard_negatives"] and cfg.get("neg_source") == "dense":
     from sentence_transformers import SentenceTransformer
+
     from wikiret.hardneg import mine_dense
 
     # pool: the chosen positives plus random other answers; embedded with the untuned model
@@ -75,7 +76,7 @@ with mlflow.start_run(run_name=cfg["name"]):
     mlflow.log_params({**{k: v for k, v in cfg.items() if k != "name"}, "pairs_dropped_overlap_with_eval": dropped})
     t0, step = time.time(), 0
     model.train()
-    for epoch in range(cfg["epochs"]):
+    for _epoch in range(cfg["epochs"]):
         order = rng.permutation(cfg["n_pairs"])
         for s in range(steps_per_epoch):
             ix = order[s * bs:(s + 1) * bs]

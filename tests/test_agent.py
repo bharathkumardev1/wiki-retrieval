@@ -5,8 +5,18 @@ from langchain_core.callbacks import CallbackManagerForRetrieverRun
 from langchain_core.documents import Document
 from langchain_core.retrievers import BaseRetriever
 
-from wikiret.agent import (REFUSAL, ExtractiveGenerator, FromLangChain, Passage, ServiceRetriever, ToLangChain,
-                           VerifyConfig, build_agent, judge_label, verify)
+from wikiret.agent import (
+    REFUSAL,
+    ExtractiveGenerator,
+    FromLangChain,
+    Passage,
+    ServiceRetriever,
+    ToLangChain,
+    VerifyConfig,
+    build_agent,
+    judge_label,
+    verify,
+)
 from wikiret.agent.verify import split_claims
 
 EIFFEL = Passage("p1", "Eiffel Tower", "The Eiffel Tower is a wrought-iron lattice tower in Paris. It was completed in 1889. "

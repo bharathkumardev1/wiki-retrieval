@@ -25,6 +25,7 @@ torch.onnx.export(model, tuple(enc[n] for n in names), out / "model.onnx", input
                   opset_version=17, dynamo=False)
 
 import onnxruntime as ort
+
 sess = ort.InferenceSession(str(out / "model.onnx"), providers=["CPUExecutionProvider"])
 q = ["who wrote hamlet", "when did the berlin wall fall", "what is the capital of australia"] * 4
 d = ["Hamlet is a tragedy written by William Shakespeare.", "The wall came down in 1989.",
@@ -40,6 +41,7 @@ report = {"model": NAME, "max_len": MAX_LEN, "max_abs_logit_diff": float(diff.ma
 # INT8 dynamic quantization: 91 MB -> 23 MB. Quality is checked end to end in scripts/eval_rerank.py,
 # not by logit parity, because quantized logits legitimately differ from the float ones.
 from onnxruntime.quantization import QuantType, quantize_dynamic
+
 q8 = out.parent / (out.name + "_int8")
 q8.mkdir(exist_ok=True)
 quantize_dynamic(str(out / "model.onnx"), str(q8 / "model.onnx"), weight_type=QuantType.QInt8)

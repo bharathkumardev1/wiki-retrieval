@@ -6,11 +6,14 @@ on:
 jobs:
   python:
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ["3.11", "3.13"]
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with:
-          python-version: "3.13"
+          python-version: ${{ matrix.python-version }}
           cache: pip
       # CPU-only torch keeps the install small; the tests use small synthetic indexes and need no model downloads.
       # The agent extra is needed because tests/test_agent.py and the retriever tests import langchain_core.

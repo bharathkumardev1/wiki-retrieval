@@ -10,6 +10,7 @@ from collections.abc import Iterable
 
 import numpy as np
 import Stemmer
+
 from .stopwords import STOPWORDS_EN
 
 _WORD = re.compile(r"\w+")

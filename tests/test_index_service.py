@@ -54,7 +54,8 @@ def test_semantic_cache_hits_near_queries_and_isolates_versions():
     cache = SemanticCache(threshold=0.97)
     q = EMB[3]
     cache.put(q, "v1", ["answer"])
-    near = (q + 0.01 * EMB[4]); near /= np.linalg.norm(near)
+    near = q + 0.01 * EMB[4]
+    near /= np.linalg.norm(near)
     assert cache.get(near.astype(np.float32), "v1")[0] == ["answer"]
     assert cache.get(near.astype(np.float32), "v2") is None
     assert cache.get(EMB[9], "v1") is None

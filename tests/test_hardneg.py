@@ -20,6 +20,7 @@ def test_norm_collapses_case_and_space():
 
 def test_dense_window_and_positive_exclusion():
     import numpy as np
+
     from wikiret.hardneg import mine_dense
     rng = np.random.default_rng(0)
     pool = rng.normal(size=(300, 8)).astype("float32")

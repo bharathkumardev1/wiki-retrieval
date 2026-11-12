@@ -14,8 +14,18 @@ import re
 from collections.abc import Callable
 from dataclasses import dataclass
 
-from .text import (clean_sentences, content_tokens, coverage, expects_number, has_number_or_date, is_instruction_like,
-                   numbers, question_tokens, quotes, strip_markers)
+from .text import (
+    clean_sentences,
+    content_tokens,
+    coverage,
+    expects_number,
+    has_number_or_date,
+    is_instruction_like,
+    numbers,
+    question_tokens,
+    quotes,
+    strip_markers,
+)
 from .types import Claim, ClaimCheck, Passage, Verdict
 
 _CITE = re.compile(r"\[\s*(\d+)\s*\]")

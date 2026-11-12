@@ -8,8 +8,15 @@ from __future__ import annotations
 
 from typing import Protocol
 
-from .text import (clean_sentences, content_tokens, coverage, expects_number, has_number_or_date, question_tokens,
-                   strip_markers)
+from .text import (
+    clean_sentences,
+    content_tokens,
+    coverage,
+    expects_number,
+    has_number_or_date,
+    question_tokens,
+    strip_markers,
+)
 from .types import Passage
 
 SYSTEM_PROMPT = (
