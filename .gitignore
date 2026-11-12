@@ -9,3 +9,5 @@ mlruns.db
 kaggle/*.zip
 
 *.log
+
+*.egg-info/
