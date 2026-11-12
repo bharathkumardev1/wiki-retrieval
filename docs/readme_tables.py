@@ -59,9 +59,9 @@ def full_corpus():
 
 def full_corpus_cost():
     ft = load("gpu_full_nq_faiss_lora_easy_t4.json")
-    pr = load("gpu_full_nq_paired_t4_summary.json")
-    rows = [["Exact float32 (flat inner product), one query",
-             f"{pr['exact_flat_ip_single_query_ms_cpu']['lora_easy']['p50']:.0f} ms",
+    runs = {r["tag"]: r["exact_flat_ip_single_query_ms"] for r in load("gpu_full_nq_paired_t4.json")["runs"]}
+    exact = f"{runs['lora_easy']['p50']:.0f} ms (p95 {runs['lora_easy']['p95']:.0f} ms)"
+    rows = [["Exact float32 (flat inner product), one query", exact,
              f"{ft['ivfpq'][0]['float32_bytes_total'] / 1e9:.2f} GB"]]
     for idx in ft["ivfpq"]:
         s = [x for x in idx["sweep"] if x["nprobe"] == 64][0]
@@ -69,6 +69,20 @@ def full_corpus_cost():
                      f"{s['single_query_ms_cpu']['p50']:.2f} ms",
                      f"{idx['code_bytes_total'] / 1e6:.0f} MB of codes, no refine"])
     return table(["Full corpus search stage (4-CPU Kaggle host)", "p50", "Vectors held for search"], rows)
+
+
+def full_corpus_paired():
+    d = load("gpu_full_nq_paired_t4.json")
+    p, mn = d["paired_lora_easy_minus_untuned"], d["means"]
+    rows = []
+    for k in ("ndcg@10", "recall@100"):
+        x = p[k]
+        lo, hi = x["bootstrap_ci95"]
+        rows.append([k, f"{mn['untuned'][k]:.4f}", f"{mn['lora_easy'][k]:.4f}",
+                     f"{x['mean_diff']:+.5f} [{lo:+.5f}, {hi:+.5f}]", f"{x['permutation_p_two_sided']:g}",
+                     f"{x['queries_improved']} / {x['queries_worse']} / {x['queries_tied']}"])
+    return table(["Full corpus, exact search, 3,452 queries", "Untuned", "LoRA", "Paired difference [95% bootstrap CI]",
+                  "Permutation p", "Queries better / worse / tied"], rows)
 
 
 def dev_stack():
@@ -91,24 +105,26 @@ def dev_stack():
 
 def lora_ablation():
     a = load("dev_arm_comparison.json")
-    rows = [
-        ["LoRA, random negatives, minus untuned", delta(a["ndcg@10: lora_easy minus untuned"])],
-        ["LoRA, BM25-mined hard negatives, minus untuned", delta(a["ndcg@10: lora_hard minus untuned"])],
-        ["LoRA, BM25-mined hard negatives, minus random negatives", delta(a["ndcg@10: lora_hard minus lora_easy"])],
-        ["LoRA, dense-mined hard negatives, minus random negatives", delta(a["ndcg@10: lora_hard_dense minus lora_easy"])],
-    ]
-    return table(["Dev slice, dense retrieval only, paired over queries", "nDCG@10 difference [95% CI]"], rows)
+    pairs = [("LoRA, random negatives, minus untuned", "lora_easy minus untuned"),
+             ("LoRA, BM25-mined hard negatives, minus untuned", "lora_hard minus untuned"),
+             ("LoRA, BM25-mined hard negatives, minus random negatives", "lora_hard minus lora_easy"),
+             ("LoRA, dense-mined hard negatives, minus random negatives", "lora_hard_dense minus lora_easy")]
+    rows = [[label, delta(a[f"ndcg@10: {k}"]), delta(a[f"hit@10: {k}"])] for label, k in pairs]
+    return table(["Dev slice, dense retrieval only, paired over queries", "nDCG@10 difference [95% CI]",
+                  "hit@10 difference [95% CI]"], rows)
 
 
 def latency():
     e = load("dev_index_lora_easy_np256_c1000.json")["stage_latency_ms_p50_p95"]
     rl = load("dev_rerank_latency.json")
+    full = load("dev_rerank_lora_easy.json")["rerank_ms_per_query"]
     rows = [
-        ["BM25", *e["bm25"]], ["Dense (IVF-PQ + refine)", *e["dense"]], ["RRF fuse", *e["fuse"]],
-        ["Cross-encoder, 20 candidates, INT8", rl["int8"]["p50_ms"], rl["int8"]["p95_ms"]],
-        ["Cross-encoder, 20 candidates, fp32", rl["fp32"]["p50_ms"], rl["fp32"]["p95_ms"]],
+        ["BM25", *e["bm25"], ""], ["Dense (IVF-PQ + refine)", *e["dense"], ""], ["RRF fuse", *e["fuse"], ""],
+        ["Cross-encoder, 20 candidates, INT8, 150 queries", rl["int8"]["p50_ms"], rl["int8"]["p95_ms"], rl["int8"]["p99_ms"]],
+        ["Cross-encoder, 20 candidates, INT8, all 3,452 queries", full["p50"], full["p95"], full["p99"]],
+        ["Cross-encoder, 20 candidates, fp32, 150 queries", rl["fp32"]["p50_ms"], rl["fp32"]["p95_ms"], rl["fp32"]["p99_ms"]],
     ]
-    return table(["Stage latency on 2 vCPU, one query at a time (ms)", "p50", "p95"], rows)
+    return table(["Stage latency on 2 vCPU, one query at a time (ms)", "p50", "p95", "p99"], rows)
 
 
 def gate():
@@ -127,21 +143,22 @@ def gate():
 
 
 def agent():
-    a = load("agent_smoke.json")
-    rows = [
-        ["Questions", a["n_questions"]],
-        ["Answered / refused", f"{a['answered']} / {a['refused']}"],
-        ["Cited passage labelled relevant, among answered",
-         f"{a['cited_passage_is_labelled_relevant_among_answered']:.1%}"],
-        ["Answered with evidence from a different question",
-         f"{a['answer_rate_with_evidence_for_a_different_question']:.1%}"],
-        ["Injection trials / answers changed",
-         f"{a['injection_trials']} / {a['answers_changed_by_planted_instruction']}"],
-    ]
-    return table(["Agent smoke test, dev corpus, BM25 top 5, extractive drafter", "Value"], rows)
+    lex, gated = load("agent_smoke.json"), load("agent_smoke_gated.json")
+
+    def col(a):
+        return [a["n_questions"], f"{a['answered']} / {a['refused']}",
+                f"{a['cited_passage_is_labelled_relevant_among_answered']:.1%}",
+                f"{a['answer_rate_with_evidence_for_a_different_question']:.1%}",
+                f"{a['injection_trials']} / {a['answers_changed_by_planted_instruction']}"]
+
+    labels = ["Questions", "Answered / refused", "Cited passage labelled relevant, among answered",
+              "Answered with evidence from a different question", "Injection trials / answers changed"]
+    rows = [[lab, x, y] for lab, x, y in zip(labels, col(lex), col(gated))]
+    return table(["Agent smoke test, dev corpus, BM25 top 5, extractive drafter",
+                  "Lexical verifier only", f"With answerability gate (threshold {gated['min_answerability']})"], rows)
 
 
-TABLES = {"full_corpus": full_corpus, "full_corpus_cost": full_corpus_cost, "dev_stack": dev_stack,
+TABLES = {"full_corpus": full_corpus, "full_corpus_paired": full_corpus_paired, "full_corpus_cost": full_corpus_cost, "dev_stack": dev_stack,
           "lora_ablation": lora_ablation, "latency": latency, "gate": gate, "agent": agent}
 PAT = re.compile(r"(<!-- table:(\w+) -->\n)(.*?)(<!-- /table:\2 -->)", re.S)
 
