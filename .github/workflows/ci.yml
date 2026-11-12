@@ -13,8 +13,9 @@ jobs:
           python-version: "3.13"
           cache: pip
       # CPU-only torch keeps the install small; the tests use small synthetic indexes and need no model downloads.
+      # The agent extra is needed because tests/test_agent.py and the retriever tests import langchain_core.
       - run: pip install torch --index-url https://download.pytorch.org/whl/cpu
-      - run: pip install -e ".[serve,dev]" ruff
+      - run: pip install -e ".[serve,agent,dev]" ruff
       - run: ruff check src tests scripts
       - run: pytest -q
 

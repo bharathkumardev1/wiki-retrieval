@@ -8,5 +8,20 @@ Requires-Dist: pyarrow>=17
 Requires-Dist: scipy>=1.13
 Requires-Dist: bm25s>=0.2
 Requires-Dist: PyStemmer>=2.2
+Provides-Extra: serve
+Requires-Dist: faiss-cpu; extra == "serve"
+Requires-Dist: fastapi; extra == "serve"
+Requires-Dist: uvicorn; extra == "serve"
+Requires-Dist: prometheus-client; extra == "serve"
+Requires-Dist: onnxruntime; extra == "serve"
+Requires-Dist: tokenizers; extra == "serve"
+Requires-Dist: sentence-transformers; extra == "serve"
+Requires-Dist: peft; extra == "serve"
+Provides-Extra: agent
+Requires-Dist: langgraph>=1.0; extra == "agent"
+Requires-Dist: langchain-core>=1.0; extra == "agent"
+Provides-Extra: train
+Requires-Dist: mlflow-skinny; extra == "train"
 Provides-Extra: dev
 Requires-Dist: pytest>=8; extra == "dev"
+Requires-Dist: httpx; extra == "dev"

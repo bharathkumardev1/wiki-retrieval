@@ -4,5 +4,23 @@ scipy>=1.13
 bm25s>=0.2
 PyStemmer>=2.2
 
+[agent]
+langgraph>=1.0
+langchain-core>=1.0
+
 [dev]
 pytest>=8
+httpx
+
+[serve]
+faiss-cpu
+fastapi
+uvicorn
+prometheus-client
+onnxruntime
+tokenizers
+sentence-transformers
+peft
+
+[train]
+mlflow-skinny
