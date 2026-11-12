@@ -3,7 +3,10 @@ plus timed exact search on the CPU so index speedups have a same-host baseline.
 
 Run in a Kaggle notebook with GPU and Internet on, lora-easy attached. Run this after
 `!pip uninstall -y torchao` in a separate cell (Kaggle's preinstalled torchao breaks peft).
-Writes /kaggle/working/full_nq_paired.json and /kaggle/working/full_nq_per_query.npz."""
+Writes /kaggle/working/full_nq_paired.json and /kaggle/working/full_nq_per_query.npz, and also prints
+the whole result (paired statistics and per-query nDCG@10 arrays) between BEGIN/END markers at the end,
+so the numbers survive a session reset even if the output files are lost. Copy that block, or take a
+screenshot of it, before closing the notebook."""
 import json
 import os
 import subprocess
@@ -108,16 +111,49 @@ def run(tag, adapter_dir):
         "p50": round(float(np.percentile(lat, 50)), 2), "p95": round(float(np.percentile(lat, 95)), 2)}}
 
 
+def paired_stats(a, b, n_boot=10000, n_perm=100000, seed=0):
+    """a - b per query: mean, bootstrap 95% CI over queries, two-sided paired permutation p-value
+    (random sign flips of the per-query differences)."""
+    d = a - b
+    rng = np.random.default_rng(seed)
+    boot = np.array([d[rng.integers(0, len(d), len(d))].mean() for _ in range(n_boot)])
+    obs = abs(d.mean())
+    signs = rng.integers(0, 2, size=(n_perm, len(d)), dtype=np.int8) * 2 - 1
+    perm = np.abs((signs * d).mean(axis=1))
+    p = (1 + int((perm >= obs - 1e-12).sum())) / (n_perm + 1)
+    return {"mean_diff": round(float(d.mean()), 5), "bootstrap_ci95": [round(float(np.quantile(boot, 0.025)), 5),
+            round(float(np.quantile(boot, 0.975)), 5)], "permutation_p_two_sided": round(p, 6),
+            "n_queries": int(len(d)), "queries_improved": int((d > 1e-12).sum()),
+            "queries_worse": int((d < -1e-12).sum()), "queries_tied": int((np.abs(d) <= 1e-12).sum())}
+
+
+def save(arrays, meta, final=False):
+    OUT.mkdir(parents=True, exist_ok=True)
+    np.savez(OUT / "full_nq_per_query.npz", qids=np.array(qids), **arrays)
+    res = {"note": "FULL CORPUS" if not SMOKE else "SMOKE TEST ONLY", "complete": final, "base_model": BASE_MODEL,
+           "adapter": adapter, "n_passages": len(ids), "n_queries": len(qtext),
+           "device_encode": torch.cuda.get_device_name(0) if DEV == "cuda" else "cpu",
+           "cpu_count": os.cpu_count(), "faiss": faiss.__version__, "runs": meta}
+    if final:
+        res["paired_lora_easy_minus_untuned"] = {m: paired_stats(arrays[f"lora_easy/{m}"], arrays[f"untuned/{m}"])
+                                                 for m in ("ndcg@10", "recall@100")}
+        res["means"] = {t: {m: round(float(arrays[f"{t}/{m}"].mean()), 4) for m in ("ndcg@10", "hit@10", "recall@10", "recall@100")}
+                        for t in ("untuned", "lora_easy")}
+        res["per_query_ndcg@10"] = {"qids": qids, "untuned": [round(float(x), 5) for x in arrays["untuned/ndcg@10"]],
+                                    "lora_easy": [round(float(x), 5) for x in arrays["lora_easy/ndcg@10"]]}
+    (OUT / "full_nq_paired.json").write_text(json.dumps(res, indent=2))
+    return res
+
+
 arrays, meta = {}, []
 for tag, ad in (("untuned", None), ("lora_easy", adapter)):
     pq_, m = run(tag, ad)
     meta.append(m)
     for k, v in pq_.items():
         arrays[f"{tag}/{k}"] = v
-OUT.mkdir(parents=True, exist_ok=True)
-np.savez(OUT / "full_nq_per_query.npz", qids=np.array(qids), **arrays)
-(OUT / "full_nq_paired.json").write_text(json.dumps({
-    "note": "FULL CORPUS" if not SMOKE else "SMOKE TEST ONLY", "base_model": BASE_MODEL, "adapter": adapter,
-    "n_passages": len(ids), "n_queries": len(qtext), "device_encode": torch.cuda.get_device_name(0) if DEV == "cuda" else "cpu",
-    "cpu_count": os.cpu_count(), "faiss": faiss.__version__, "runs": meta}, indent=2))
-print(open(OUT / "full_nq_paired.json").read())
+    save(arrays, meta)  # partial save after each arm
+res = save(arrays, meta, final=True)
+print("BEGIN full_nq_paired.json")
+print(json.dumps(res))
+print("END full_nq_paired.json")
+print("SUMMARY", json.dumps({k: res[k] for k in ("means", "paired_lora_easy_minus_untuned")}, indent=1))
