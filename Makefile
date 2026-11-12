@@ -1,5 +1,9 @@
 PYTHON_IMAGE ?= python:3.13-slim
 
+# On macOS, torch and faiss each load their own OpenMP runtime; without these two settings the server aborts at
+# start or the first search hangs. Seen on an Apple M2 with Python 3.12; not needed on Linux.
+OMP_FIX := $(if $(filter Darwin,$(shell uname -s)),KMP_DUPLICATE_LIB_OK=TRUE OMP_NUM_THREADS=1,)
+
 .PHONY: dev-data serve-untuned run test lint image kind-up kind-load kind-deploy kind-down loadtest localstack tf-apply tf-destroy
 
 # Everything `python -m wikiret.serve` needs on a fresh clone, with the untuned encoder (no training).
@@ -11,7 +15,7 @@ dev-data:
 	.venv/bin/python scripts/export_reranker.py artifacts/reranker
 
 serve-untuned:
-	WIKIRET_TAG=untuned WIKIRET_ADAPTER= .venv/bin/python -m wikiret.serve
+	$(OMP_FIX) WIKIRET_TAG=untuned WIKIRET_ADAPTER= .venv/bin/python -m wikiret.serve
 
 run:
 	PYTHON_IMAGE=$(PYTHON_IMAGE) docker compose up --build
