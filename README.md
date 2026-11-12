@@ -10,7 +10,7 @@ A passage search service over Natural Questions text from Wikipedia. It fuses BM
 
 Text in the examples and tables comes from Wikipedia (CC BY-SA) by way of BEIR Natural Questions.
 
-**Demo.** Recorded walkthrough (about 3 minutes): https://www.youtube.com/watch?v=5vtW4iaUe3A. The live search in the video uses the untuned encoder. There is no hosted demo, the repo is private, and the service runs locally (see "Reproducing the tables and serving it"). This session came from the LoRA adapter I trained; the untuned quickstart under "Reproducing the tables and serving it" returns the same top results for this query. A captured session:
+**Demo.** Recorded walkthrough (about 3 minutes): https://www.youtube.com/watch?v=5vtW4iaUe3A. The live search in the video uses the untuned encoder. There is no hosted demo; the service runs locally (see "Reproducing the tables and serving it"). This session came from the LoRA adapter I trained; the untuned quickstart under "Reproducing the tables and serving it" returns the same top results for this query. A captured session:
 
 ```
 $ python -m wikiret.serve &            # dev slice, 104,201 passages, LoRA adapter, INT8 reranker on the top 20
