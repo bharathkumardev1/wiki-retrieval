@@ -136,14 +136,14 @@ Each has an ADR in `docs/adr/` with the alternatives I considered and the number
 
 ## Run it
 
-The retrieval data is not in the repo and I have not scripted the BEIR NQ download and conversion, so a fresh clone cannot reproduce the numbers end to end yet. Python 3.11 or later:
+The retrieval data is not in the repo. Python 3.11 or later:
 
 ```
 pip install -e '.[serve,dev]'
 pytest -q                      # 79 tests, no data needed
 ```
 
-With `data/nq` (corpus.parquet, queries.parquet, qrels_test.tsv) in place, `python scripts/make_dev_corpus.py data/nq data/dev` builds the slice, `scripts/run_ablation.sh` trains and evaluates the adapters, and `scripts/eval_index.py`, `scripts/eval_rerank.py` and `scripts/answerability_gate.py` reproduce the tables above. Full-corpus rows come from the notebooks in `kaggle/` on a T4 and take a few hours.
+`python scripts/fetch_nq.py data/nq` downloads BEIR NQ (about 765 MB) from the Hugging Face Hub as corpus.parquet, queries.parquet and qrels_test.tsv; I checked that its output is byte-identical to the files my numbers came from. Then `python scripts/make_dev_corpus.py data/nq data/dev` builds the slice, `scripts/run_ablation.sh` trains and evaluates the adapters, and `scripts/eval_index.py`, `scripts/eval_rerank.py` and `scripts/answerability_gate.py` reproduce the tables above. Full-corpus rows come from the notebooks in `kaggle/` on a T4 and take a few hours.
 
 To serve, with `data/dev` and `artifacts/` built:
 
