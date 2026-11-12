@@ -67,8 +67,8 @@ def full_corpus_cost():
         s = [x for x in idx["sweep"] if x["nprobe"] == 64][0]
         rows.append([f"IVF-PQ {idx['pq_bytes_per_vector']} B/vector, nprobe 64, one query",
                      f"{s['single_query_ms_cpu']['p50']:.2f} ms",
-                     f"{idx['code_bytes_total'] / 1e6:.0f} MB"])
-    return table(["Full corpus search stage (4-CPU Kaggle host)", "p50", "Index size"], rows)
+                     f"{idx['code_bytes_total'] / 1e6:.0f} MB of codes, no refine"])
+    return table(["Full corpus search stage (4-CPU Kaggle host)", "p50", "Vectors held for search"], rows)
 
 
 def dev_stack():
