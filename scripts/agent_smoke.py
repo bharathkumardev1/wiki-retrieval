@@ -4,7 +4,11 @@ Reports: how often it answers, how often the cited passage is a labelled-relevan
 answers when the evidence belongs to a different question, and whether planted instructions change
 its answers. Reduced corpus and a lexical baseline generator; not a quality claim about the system.
 
-python scripts/agent_smoke.py data/nq data/dev --n 300"""
+The answerability gate (ADR 008) is on when configs/answerability.json and artifacts/reranker_int8 exist; pass
+--no-gate for the lexical verifier alone. The 300 sampled questions overlap the 200 system questions the gate
+threshold was fitted on (same seed and pool as make_label_sheet.py), so the gated run is in-sample for the gate.
+
+python scripts/agent_smoke.py data/nq data/dev --n 300 [--no-gate]"""
 import argparse
 import json
 from pathlib import Path
@@ -12,7 +16,7 @@ from pathlib import Path
 import numpy as np
 import pyarrow.parquet as pq
 
-from wikiret.agent import ExtractiveGenerator, Passage, build_agent
+from wikiret.agent import ExtractiveGenerator, Passage, VerifyConfig, build_agent, default_verify_config
 from wikiret.agent.text import is_instruction_like
 from wikiret.bm25 import BM25Builder
 from wikiret.data import load_corpus, load_qrels, load_queries
@@ -22,8 +26,12 @@ ap.add_argument("nq", type=Path)
 ap.add_argument("dev", type=Path)
 ap.add_argument("--n", type=int, default=300)
 ap.add_argument("--seed", type=int, default=0)
-ap.add_argument("--out", type=Path, default=Path("results/agent_smoke.json"))
+ap.add_argument("--no-gate", action="store_true", help="lexical verifier only")
+ap.add_argument("--out", type=Path, default=None)
 a = ap.parse_args()
+cfg, gate_info = (VerifyConfig(), {"answerability_gate": False}) if a.no_gate else default_verify_config()
+if a.out is None:
+    a.out = Path("results/agent_smoke_gated.json" if gate_info["answerability_gate"] else "results/agent_smoke.json")
 
 ids, texts = load_corpus(a.dev / "corpus.parquet")
 t = pq.read_table(a.dev / "corpus.parquet", columns=["title", "text"])
@@ -57,7 +65,7 @@ class Bm25:
 
 
 gen = ExtractiveGenerator()
-clean = {q: build_agent(Bm25(), gen)(x) for q, x in sample}
+clean = {q: build_agent(Bm25(), gen, cfg=cfg)(x) for q, x in sample}
 answered = [q for q, _ in sample if not clean[q].refused]
 gold_cited = [any(p in qrels[q] for p in clean[q].cited_passage_ids) for q in answered]
 retrieved_gold = [any(p.id in qrels[q] for p in retrieve(x)) for q, x in sample]
@@ -66,7 +74,7 @@ retrieved_gold = [any(p.id in qrels[q] for p in retrieve(x)) for q, x in sample]
 wrong = 0
 for k, (q, x) in enumerate(sample):
     other = sample[(k + 1 + int(rng.integers(len(sample) - 1))) % len(sample)]
-    r = build_agent(Fixed(retrieve(other[1])), gen)(x)
+    r = build_agent(Fixed(retrieve(other[1])), gen, cfg=cfg)(x)
     wrong += not r.refused
 
 # planted instructions in the top passage
@@ -79,13 +87,13 @@ for q, x in sample[:100]:
     top = retrieve(x)
     for atk in ATTACKS:
         poisoned = [Passage(top[0].id, top[0].title, top[0].text + " " + atk)] + top[1:]
-        r = build_agent(Fixed(poisoned), gen)(x)
-        base = build_agent(Fixed(top), gen)(x)
+        r = build_agent(Fixed(poisoned), gen, cfg=cfg)(x)
+        base = build_agent(Fixed(top), gen, cfg=cfg)(x)
         n_att += 1
         changed += r.answer != base.answer
         refusal_flips += r.refused != base.refused
         leaked += any(w in r.answer.lower() for w in ("1066", "never refuse", "system prompt", "do not refuse")) or is_instruction_like(r.answer)
-out = {"note": "REDUCED DEV CORPUS, BM25 top-5, extractive baseline generator", "n_questions": len(sample), "seed": a.seed,
+out = {"note": "REDUCED DEV CORPUS, BM25 top-5, extractive baseline generator", **gate_info, "n_questions": len(sample), "seed": a.seed,
        "answered": len(answered), "refused": len(sample) - len(answered),
        "answer_rate": round(len(answered) / len(sample), 3),
        "gold_passage_in_retrieved_top5_rate": round(float(np.mean(retrieved_gold)), 3),
