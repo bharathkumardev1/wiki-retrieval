@@ -13,6 +13,10 @@ I confirmed that `data/train/nq_pairs.parquet`, the file every adapter in `resul
 identical to the upstream parquet: same 100,231 rows, same bytes (sha256 `8cfb5e5a7cb1...`). The script
 pins that hash.
 
-Training and test come from the same Natural Questions release but different splits. As a leakage
-check, `train_biencoder.py` drops every training pair whose answer text appears in the dev corpus, and I
-checked that none of the training questions appears among the 3,452 BEIR test queries.
+Training and test come from the same Natural Questions release but different splits. `train_biencoder.py`
+drops every training pair whose answer text appears in the dev corpus. Matching question text after
+lowercasing and stripping punctuation, 5 of the 3,452 test queries (0.14%) also appear among the training
+questions. The answer filter removes the training pair for 2 of them; the pairs for the other 3 stay in the
+training set (8,000 pairs are sampled from the roughly 100,000, so a given pair is trained on only if it was
+drawn). I did not rerun any evaluation with those 5 queries excluded. At 5 of 3,452 queries the effect on
+a mean is small, but it is not zero.
