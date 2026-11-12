@@ -1,0 +1,93 @@
+{
+  "n_rows": 300,
+  "n_system_rows": 200,
+  "label_counts_system": {
+    "supported": 48,
+    "partial": 76,
+    "not_supported": 76
+  },
+  "ce_query_answer": {
+    "auc_supported_vs_rest_system": 0.678,
+    "auc_not_supported_vs_rest_system": 0.743,
+    "crossfit_system_percent_agreement": 0.515,
+    "crossfit_system_kappa_3class": 0.245,
+    "crossfit_system_kappa_3class_ci95": [
+      0.143,
+      0.348
+    ],
+    "crossfit_system_kappa_linear_weighted": 0.317,
+    "confusion_rows_human_cols_judge": [
+      [
+        15,
+        25,
+        8
+      ],
+      [
+        15,
+        45,
+        16
+      ],
+      [
+        2,
+        31,
+        43
+      ]
+    ]
+  },
+  "ce_query_passage": {
+    "auc_supported_vs_rest_system": 0.762,
+    "auc_not_supported_vs_rest_system": 0.873,
+    "crossfit_system_percent_agreement": 0.57,
+    "crossfit_system_kappa_3class": 0.355,
+    "crossfit_system_kappa_3class_ci95": [
+      0.251,
+      0.458
+    ],
+    "crossfit_system_kappa_linear_weighted": 0.455,
+    "confusion_rows_human_cols_judge": [
+      [
+        30,
+        12,
+        6
+      ],
+      [
+        32,
+        27,
+        17
+      ],
+      [
+        5,
+        14,
+        57
+      ]
+    ]
+  },
+  "ce_sum": {
+    "auc_supported_vs_rest_system": 0.742,
+    "auc_not_supported_vs_rest_system": 0.837,
+    "crossfit_system_percent_agreement": 0.58,
+    "crossfit_system_kappa_3class": 0.345,
+    "crossfit_system_kappa_3class_ci95": [
+      0.245,
+      0.434
+    ],
+    "crossfit_system_kappa_linear_weighted": 0.42,
+    "confusion_rows_human_cols_judge": [
+      [
+        15,
+        31,
+        2
+      ],
+      [
+        13,
+        58,
+        5
+      ],
+      [
+        2,
+        31,
+        43
+      ]
+    ]
+  }
+}

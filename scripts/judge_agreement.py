@@ -16,8 +16,8 @@ ALIASES = {"supported": "supported", "partial": "partial", "partially": "partial
 
 
 def load(sheet: Path, judge: Path, allow_blank: bool):
-    human = {r["row_id"]: r["human_label"].strip().lower().replace("-", " ") for r in csv.DictReader(open(sheet, encoding="utf-8"))}
-    jrows = {r["row_id"]: r for r in csv.DictReader(open(judge, encoding="utf-8"))}
+    human = {r["row_id"]: r["human_label"].strip().lower().replace("-", " ") for r in csv.DictReader(open(sheet, encoding="utf-8-sig"))}
+    jrows = {r["row_id"]: r for r in csv.DictReader(open(judge, encoding="utf-8-sig"))}
     blank = [k for k, v in human.items() if not v]
     bad = {k: v for k, v in human.items() if v and v not in ALIASES}
     if bad:

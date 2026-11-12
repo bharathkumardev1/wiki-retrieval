@@ -1,0 +1,149 @@
+{
+  "overall": {
+    "n": 300,
+    "percent_agreement": 0.4933,
+    "kappa_3class": 0.2719,
+    "kappa_3class_ci95": [
+      0.2216,
+      0.3226
+    ],
+    "kappa_3class_linear_weighted": 0.3325,
+    "kappa_supported_vs_not": 0.1663,
+    "kappa_supported_vs_not_ci95": [
+      0.1127,
+      0.2228
+    ],
+    "confusion_rows_human_cols_judge": {
+      "labels": [
+        "supported",
+        "partial",
+        "not_supported"
+      ],
+      "matrix": [
+        [
+          46,
+          2,
+          0
+        ],
+        [
+          74,
+          2,
+          0
+        ],
+        [
+          74,
+          2,
+          100
+        ]
+      ]
+    },
+    "human_label_counts": {
+      "supported": 48,
+      "partial": 76,
+      "not_supported": 176
+    },
+    "judge_label_counts": {
+      "supported": 194,
+      "partial": 6,
+      "not_supported": 100
+    }
+  },
+  "stratum_system": {
+    "n": 200,
+    "percent_agreement": 0.24,
+    "kappa_3class": -0.0056,
+    "kappa_3class_ci95": [
+      -0.0322,
+      0.0176
+    ],
+    "kappa_3class_linear_weighted": -0.005,
+    "kappa_supported_vs_not": -0.0075,
+    "kappa_supported_vs_not_ci95": [
+      -0.0417,
+      0.0183
+    ],
+    "confusion_rows_human_cols_judge": {
+      "labels": [
+        "supported",
+        "partial",
+        "not_supported"
+      ],
+      "matrix": [
+        [
+          46,
+          2,
+          0
+        ],
+        [
+          74,
+          2,
+          0
+        ],
+        [
+          74,
+          2,
+          0
+        ]
+      ]
+    },
+    "human_label_counts": {
+      "supported": 48,
+      "partial": 76,
+      "not_supported": 76
+    },
+    "judge_label_counts": {
+      "supported": 194,
+      "partial": 6,
+      "not_supported": 0
+    }
+  },
+  "stratum_control": {
+    "n": 100,
+    "percent_agreement": 1.0,
+    "kappa_3class": 1.0,
+    "kappa_3class_ci95": [
+      1.0,
+      1.0
+    ],
+    "kappa_3class_linear_weighted": 1.0,
+    "kappa_supported_vs_not": 1.0,
+    "kappa_supported_vs_not_ci95": [
+      1.0,
+      1.0
+    ],
+    "confusion_rows_human_cols_judge": {
+      "labels": [
+        "supported",
+        "partial",
+        "not_supported"
+      ],
+      "matrix": [
+        [
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          100
+        ]
+      ]
+    },
+    "human_label_counts": {
+      "supported": 0,
+      "partial": 0,
+      "not_supported": 100
+    },
+    "judge_label_counts": {
+      "supported": 0,
+      "partial": 0,
+      "not_supported": 100
+    }
+  }
+}
