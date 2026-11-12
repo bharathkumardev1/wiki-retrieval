@@ -18,7 +18,7 @@ What was run, what was only written, and where the limits are. Everything below 
 
 - **kind cluster.** `kind create cluster` with the config in `deploy/kind-config.yaml` started the node container and then failed in the control plane: `runc create failed ... can't get final child's PID from pipe: EOF`. That is a nested-container limit of this sandbox, not a finding about the manifests. The Deployment and Service in `deploy/k8s/search.yaml` were therefore never applied to a running cluster, and the probes, resource limits and hostPath mounts are untested. Treat `make kind-up kind-load kind-deploy` as unverified until it has run on a normal Docker host.
 - **CI.** `.github/workflows/ci.yml` parses as YAML and each step's command was run locally where possible (`go vet`, `go test`, `terraform fmt`, `init -backend=false`, `validate`, `pytest`, `docker build`). The workflow itself has not run on GitHub.
-- **ruff.** The configured rules (syntax errors and pyflakes) report 3 unused imports in files outside this change. CI will fail on them until they are removed.
+- **ruff.** The configured rules (syntax errors and pyflakes) passed after three unused imports were removed.
 - **Prometheus scraping.** The pod carries scrape annotations. No Prometheus server was run against it.
 
 ## Not measured

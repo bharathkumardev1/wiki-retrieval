@@ -1,6 +1,6 @@
 # 006. Cited answers are gated by a deterministic verifier, with a bounded retry and a refusal
 
-Status: accepted for the extractive baseline; the support judge is not yet validated against human labels
+Status: accepted for the extractive baseline; the lexical support judge did not agree with the labelled sheet, see ADR 008
 
 ## Context
 An answer agent over Wikipedia passages can fail in two ways that matter more than a low score: it states something
@@ -54,10 +54,9 @@ retriever would return the same passages.
 - Sentence splitting is a regular expression and mis-splits some abbreviations.
 
 ## What is and is not validated
-The thresholds (0.7, 0.5) were set up front and have not been tuned. The 300-row sheet in scripts/make_label_sheet.py is
-for the human labels that will measure agreement (scripts/judge_agreement.py). Tune on half of those rows and report on
-the other half. Until then the support judge has no measured agreement with people, and nothing should be said about it
-beyond the counts above.
+The thresholds (0.7, 0.5) were set up front and were not tuned. Scored against the 300-row labelled sheet (results/judge_agreement_lexical.json),
+the lexical judge agreed with the labels at chance on the 200 system answers (kappa -0.006, interval -0.032 to 0.018): it called 194 of 200 supported.
+ADR 008 replaces it with a cross-encoder answerability gate and reports its out-of-sample agreement.
 
 The optional answerability hook takes any function of (question, passage). The intended use is the ONNX cross-encoder
 from the search service. It has not been run here, and its threshold has to be calibrated on the same labels.
