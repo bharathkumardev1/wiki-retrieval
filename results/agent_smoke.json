@@ -1,5 +1,6 @@
 {
   "note": "REDUCED DEV CORPUS, BM25 top-5, extractive baseline generator",
+  "answerability_gate": false,
   "n_questions": 300,
   "seed": 0,
   "answered": 251,

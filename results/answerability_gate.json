@@ -17,5 +17,5 @@
     "refused_of_supported_or_partial": 0.202
   },
   "model": "cross-encoder/ms-marco-MiniLM-L6-v2, INT8 ONNX, max_len 256",
-  "note": "labels supplied by the project owner, two passes (agreement 84%, kappa 0.73); single annotator"
+  "note": "one annotator, who is also the author; the two labelling passes agreed on 84% of rows (kappa 0.73) and the first pass is not in the repo"
 }
