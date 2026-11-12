@@ -12,7 +12,7 @@ On the full corpus, IVF-PQ at 96 bytes per vector answers in 4.6 ms and holds 25
 
 ## Mined negatives lost
 
-Hard negatives are the standard advice for contrastive fine-tuning. BM25-mined negatives came out behind random in-batch negatives (-0.0035 nDCG@10 [-0.0066, -0.0005]), and dense-mined negatives tied on nDCG@10 and fell behind on hit@10 (-0.0067 [-0.0116, -0.0020]). I kept the simple arm. Training loss was near 0.04 within 20 steps, which suggests the batches were too easy for any negative to matter, though I did not test that.
+Hard negatives are the standard advice for contrastive fine-tuning. BM25-mined negatives came out behind random in-batch negatives (-0.0035 nDCG@10 [-0.0066, -0.0005]), and dense-mined negatives tied on nDCG@10 and fell behind on hit@10 (-0.0067 [-0.0116, -0.0020]). I kept the simple arm. Logged loss averaged 0.063 with random negatives, 0.128 with BM25-mined and 0.180 with dense-mined negatives. I did not test why mined negatives did not help: too few pairs, unlabelled positives among the mined passages, the sampling window and a single seed are all possible.
 
 ## A lexical judge, then a cross-encoder gate
 

@@ -3,7 +3,7 @@ PYTHON_IMAGE ?= python:3.13-slim
 .PHONY: dev-data serve-untuned run test lint image kind-up kind-load kind-deploy kind-down loadtest localstack tf-apply tf-destroy
 
 # Everything `python -m wikiret.serve` needs on a fresh clone, with the untuned encoder (no training).
-# Downloads about 765 MB, then encodes 104,201 passages (about 30 minutes on 2 vCPU).
+# Downloads about 765 MB, then encodes 104,201 passages (26 to 29 minutes on 2 vCPU, from results/dev_*.json).
 dev-data:
 	.venv/bin/python scripts/fetch_nq.py data/nq
 	.venv/bin/python scripts/make_dev_corpus.py data/nq data/dev

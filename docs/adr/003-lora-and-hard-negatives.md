@@ -19,4 +19,4 @@ Hard against easy: -0.0035 [-0.0066, -0.0005] for BM25-mined, -0.0023 [-0.0056, 
 Keep LoRA with in-batch negatives. At this scale the BM25-mined arm is slightly worse and the dense-mined arm is indistinguishable from easy, so I make no claim that hard negatives help. The training pairs come from `docs/data.md`.
 
 ## Open question
-Training loss sat near 0.04 from step 20, so the batches may be too easy for any negative to matter. I did not test that. The setup is small (8,000 pairs, one epoch, one negative per query) and the result could change with more data. I also did not correct for the three comparisons.
+Logged loss (12 values per run, every 20 steps) averaged 0.063 with random negatives, 0.128 with BM25-mined and 0.180 with dense-mined negatives. I did not test why mined negatives did not help; candidates are too few pairs or one epoch, unlabelled positives among the mined passages, the sampling window and a single seed. The setup is small (8,000 pairs, one epoch, one negative per query) and the result could change with more data. I also did not correct for the three comparisons.
