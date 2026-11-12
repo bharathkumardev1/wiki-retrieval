@@ -1,7 +1,7 @@
 {
   "note": "FULL CORPUS",
   "base_model": "sentence-transformers/msmarco-MiniLM-L6-cos-v5",
-  "adapter": "/kaggle/input/datasets/bharath1452/lora-easy/lora_easy",
+  "adapter": "<kaggle input dataset>/lora_easy",
   "n_passages": 2681468,
   "n_queries": 3452,
   "device_encode": "Tesla T4",
