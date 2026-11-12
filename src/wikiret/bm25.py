@@ -10,7 +10,7 @@ from collections.abc import Iterable
 
 import numpy as np
 import Stemmer
-from bm25s.stopwords import STOPWORDS_EN
+from .stopwords import STOPWORDS_EN
 
 _WORD = re.compile(r"\w+")
 _STOP = frozenset(STOPWORDS_EN)

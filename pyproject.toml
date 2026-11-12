@@ -3,7 +3,7 @@ name = "wikiret"
 version = "0.1.0"
 description = "Passage retrieval over Wikipedia: BM25, dense, hybrid, with a reproducible evaluation harness."
 requires-python = ">=3.11"
-dependencies = ["numpy>=2.0", "pyarrow>=17", "scipy>=1.13", "bm25s>=0.2", "PyStemmer>=2.2"]
+dependencies = ["numpy>=2.0", "pyarrow>=17", "scipy>=1.13", "PyStemmer>=2.2"]
 
 [project.optional-dependencies]
 serve = ["faiss-cpu", "fastapi", "uvicorn", "prometheus-client", "onnxruntime", "tokenizers", "sentence-transformers", "peft"]

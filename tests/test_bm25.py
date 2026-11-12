@@ -58,3 +58,10 @@ def test_ranking_order_and_k_larger_than_corpus():
     top, sc = idx.search("fox", k=50)
     assert len(top) == 4 and list(sc) == sorted(sc, reverse=True)
     assert set(top[:2]) == {0, 1}
+
+
+def test_stopword_list_is_the_one_the_results_used():
+    from wikiret.stopwords import STOPWORDS_EN
+
+    assert len(STOPWORDS_EN) == 33
+    assert {"the", "of", "and", "is"} <= STOPWORDS_EN
